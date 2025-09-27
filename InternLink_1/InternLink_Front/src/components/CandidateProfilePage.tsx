@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { initialCandidateData } from './candidateData';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
@@ -26,7 +28,10 @@ import {
   Check,
   AlertTriangle,
   Users,
-  Home
+  Home,
+  CheckCircle,
+  XCircle,
+  Shield
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -34,11 +39,71 @@ interface CandidateProfilePageProps {
   onNavigate: (page: string) => void;
 }
 
+interface EligibilityStatus {
+  overall: 'eligible' | 'not-eligible' | 'partial' | 'pending';
+  age: 'eligible' | 'not-eligible' | 'pending';
+  academic: 'eligible' | 'not-eligible' | 'pending';
+  education: 'eligible' | 'not-eligible' | 'pending';
+  income: 'eligible' | 'not-eligible' | 'pending';
+  participation: 'eligible' | 'not-eligible' | 'pending';
+  employment: 'eligible' | 'not-eligible' | 'pending';
+  citizenship: 'eligible' | 'not-eligible' | 'pending';
+  family: 'eligible' | 'not-eligible' | 'pending';
+  issues: string[];
+  warnings: string[];
+}
+
+interface FormData {
+  dateOfBirth: string;
+  category: string;
+  familyIncome: string;
+  highestDegree: string;
+  institution: string;
+  cgpa: string;
+  class12Marks: string;
+  pmInternshipPrevious: boolean;
+  pmSkillingPrevious: boolean;
+  otherGovtScheme: boolean;
+  natsNapsTraining: boolean;
+  currentlyEmployed: boolean;
+  govtEmployee: boolean;
+  citizenship: string;
+}
+
 export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) {
-  const [activeTab, setActiveTab] = useState('basic');
+  const [activeTab, setActiveTab] = useState('personal');
   const [skills, setSkills] = useState<string[]>(['JavaScript', 'React', 'Python']);
   const [newSkill, setNewSkill] = useState('');
   const [savedSections, setSavedSections] = useState<string[]>([]);
+  const [formData, setFormData] = useState<FormData>({
+    dateOfBirth: '',
+    category: '',
+    familyIncome: '',
+    highestDegree: '',
+    institution: '',
+    cgpa: '',
+    class12Marks: '',
+    pmInternshipPrevious: false,
+    pmSkillingPrevious: false,
+    otherGovtScheme: false,
+    natsNapsTraining: false,
+    currentlyEmployed: false,
+    govtEmployee: false,
+    citizenship: ''
+  });
+  const [eligibilityStatus, setEligibilityStatus] = useState<EligibilityStatus>({
+    overall: 'pending',
+    age: 'pending',
+    academic: 'pending',
+    education: 'pending',
+    income: 'pending',
+    participation: 'pending',
+    employment: 'pending',
+    citizenship: 'pending',
+    family: 'pending',
+    issues: [],
+    warnings: []
+  });
 
   // Common skills for quick selection
   const commonSkills = [
@@ -47,6 +112,191 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
     'Figma', 'Adobe Photoshop', 'UI/UX Design', 'Project Management', 'Communication',
     'Leadership', 'Problem Solving', 'Teamwork', 'Public Speaking'
   ];
+
+  // Calculate age from date of birth
+  const calculateAge = (dateOfBirth: string) => {
+    if (!dateOfBirth) return null;
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  // Eligibility validation logic
+  const validateEligibility = () => {
+    const issues: string[] = [];
+    const warnings: string[] = [];
+    const status: EligibilityStatus = {
+      overall: 'pending',
+      age: 'pending',
+      academic: 'pending',
+      education: 'pending',
+      income: 'pending',
+      participation: 'pending',
+      employment: 'pending',
+      citizenship: 'pending',
+      family: 'pending',
+      issues,
+      warnings
+    };
+
+    // Age validation (21-24 years for PM Internship Scheme)
+    if (formData.dateOfBirth) {
+      const age = calculateAge(formData.dateOfBirth);
+      if (age !== null) {
+        if (age < 21) {
+          status.age = 'not-eligible';
+          issues.push(`Age requirement not met: You must be at least 21 years old (Current age: ${age})`);
+        } else if (age > 24) {
+          status.age = 'not-eligible';
+          issues.push(`Age limit exceeded: Maximum age allowed is 24 years (Current age: ${age})`);
+        } else {
+          status.age = 'eligible';
+        }
+      }
+    }
+
+    // Citizenship validation
+    if (formData.citizenship) {
+      if (formData.citizenship === 'indian') {
+        status.citizenship = 'eligible';
+      } else {
+        status.citizenship = 'not-eligible';
+        issues.push('Citizenship requirement: You must be an Indian citizen to be eligible for PM Internship Scheme');
+      }
+    }
+
+    // Education validation - Updated for PM Internship Scheme
+    if (formData.highestDegree && formData.institution) {
+      // Excluded prestigious institutions
+      const excludedInstitutions = [
+        'iit', 'iim', 'national law university', 'iiser', 'nid', 'iiit'
+      ];
+      
+      // Excluded degrees
+      const excludedDegrees = [
+        'phd', 'mtech', 'msc', 'mca', 'mba', 'ma', 'mcom', 'llm',
+        'ca', 'cma', 'cs', 'mbbs', 'bds'
+      ];
+      
+      // Check for excluded institutions
+      const institutionLower = formData.institution.toLowerCase();
+      const isExcludedInstitution = excludedInstitutions.some(inst => 
+        institutionLower.includes(inst)
+      );
+      
+      if (isExcludedInstitution) {
+        status.education = 'not-eligible';
+        issues.push('Institution not eligible: Graduates from IITs, IIMs, National Law Universities, IISERs, NIDs, and IIITs are not eligible');
+      } else if (excludedDegrees.includes(formData.highestDegree)) {
+        status.education = 'not-eligible';
+        if (['ca', 'cma', 'cs', 'mbbs', 'bds'].includes(formData.highestDegree)) {
+          issues.push('Professional qualification not eligible: CA, CMA, CS, MBBS, BDS holders are not eligible');
+        } else {
+          issues.push('Education level not eligible: Master\'s degree or higher qualification holders are not eligible');
+        }
+      } else {
+        // Eligible degrees: class12, iti, diploma, ba, bsc, bcom, bca, bba, bpharma
+        const eligibleDegrees = ['class12', 'btech', 'iti', 'diploma', 'ba', 'bsc', 'bcom', 'bca', 'bba', 'bpharma'];
+        if (eligibleDegrees.includes(formData.highestDegree)) {
+          status.education = 'eligible';
+          if (formData.highestDegree === 'class12') {
+            warnings.push('Education consideration: Having completed only Class 12th. Consider pursuing higher education for better opportunities.');
+          }
+        } else {
+          status.education = 'not-eligible';
+          issues.push('Education qualification not eligible: Only High School, ITI, Diploma, BA, BSc, BCom, BCA, BBA, or BPharma graduates are eligible');
+        }
+      }
+    }
+
+    // Income validation - Family income must not exceed ₹8,00,000
+    if (formData.familyIncome) {
+      const eligibleIncomeRanges = ['below-1-lakh', '1-3-lakh', '3-5-lakh', '5-8-lakh'];
+      if (eligibleIncomeRanges.includes(formData.familyIncome)) {
+        status.income = 'eligible';
+      } else {
+        status.income = 'not-eligible';
+        issues.push('Income limit exceeded: Annual family income must not exceed ₹8,00,000 for PM Internship Scheme');
+      }
+    }
+
+    // Employment status validation
+    if (formData.currentlyEmployed) {
+      status.employment = 'not-eligible';
+      issues.push('Employment status: Currently employed candidates are not eligible for PM Internship Scheme');
+    } else {
+      status.employment = 'eligible';
+    }
+
+    // Family government employee validation
+    if (formData.govtEmployee) {
+      status.family = 'not-eligible';
+      issues.push('Family member employment: No family member (self, parents, spouse) can be a permanent or regular government employee');
+    } else {
+      status.family = 'eligible';
+    }
+
+    // Previous participation validation - More comprehensive
+    if (formData.pmInternshipPrevious || formData.pmSkillingPrevious || formData.natsNapsTraining) {
+      status.participation = 'not-eligible';
+      if (formData.pmInternshipPrevious) {
+        issues.push('Previous participation: You have already participated in a PM-level internship scheme');
+      }
+      if (formData.pmSkillingPrevious) {
+        issues.push('Previous participation: You have already participated in a PM-level skilling scheme');
+      }
+      if (formData.natsNapsTraining) {
+        issues.push('Previous training: Candidates who completed NATS or NAPS apprenticeship/training are not eligible');
+      }
+    } else if (formData.otherGovtScheme) {
+      status.participation = 'eligible';
+      warnings.push('Previous participation: Participation in other government schemes may affect selection priority');
+    } else {
+      status.participation = 'eligible';
+    }
+
+    // Overall status calculation
+    const allStatuses = [
+      status.age, 
+      status.education, 
+      status.income, 
+      status.participation, 
+      status.employment, 
+      status.citizenship, 
+      status.family
+    ];
+    const eligibleCount = allStatuses.filter(s => s === 'eligible').length;
+    const notEligibleCount = allStatuses.filter(s => s === 'not-eligible').length;
+    const pendingCount = allStatuses.filter(s => s === 'pending').length;
+
+    if (notEligibleCount > 0) {
+      status.overall = 'not-eligible';
+    } else if (pendingCount > 0) {
+      status.overall = 'pending';
+    } else if (eligibleCount === allStatuses.length) {
+      status.overall = 'eligible';
+    } else {
+      status.overall = 'partial';
+    }
+
+    return status;
+  };
+
+  // Update form data and recalculate eligibility
+  const updateFormData = (field: keyof FormData, value: string | boolean) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Effect to recalculate eligibility when form data changes
+  useEffect(() => {
+    const newStatus = validateEligibility();
+    setEligibilityStatus(newStatus);
+  }, [formData]);
 
   const addSkill = () => {
     if (newSkill.trim() && !skills.includes(newSkill.trim())) {
@@ -74,15 +324,136 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
 
   const isSectionSaved = (section: string) => savedSections.includes(section);
 
+  const getEligibilityIcon = (status: string) => {
+    switch (status) {
+      case 'eligible':
+        return <CheckCircle className="w-4 h-4 text-green-600" />;
+      case 'not-eligible':
+        return <XCircle className="w-4 h-4 text-red-600" />;
+      case 'pending':
+        return <AlertTriangle className="w-4 h-4 text-yellow-600" />;
+      default:
+        return <AlertTriangle className="w-4 h-4 text-gray-400" />;
+    }
+  };
+
+  const getEligibilityColor = (status: string) => {
+    switch (status) {
+      case 'eligible':
+        return 'text-green-600 bg-green-50 border-green-200';
+      case 'not-eligible':
+        return 'text-red-600 bg-red-50 border-red-200';
+      case 'partial':
+        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+      default:
+        return 'text-gray-600 bg-gray-50 border-gray-200';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
+        {/* Header with Eligibility Status */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Complete Your Profile</h1>
-          <p className="text-gray-600">
-            Build a comprehensive profile to get matched with the best internship opportunities
-          </p>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Complete Your Profile</h1>
+              <p className="text-gray-600">
+                Build a comprehensive profile to get matched with the best internship opportunities
+              </p>
+            </div>
+            
+            {/* Eligibility Status Card */}
+            <Card className={`w-80 border-2 ${getEligibilityColor(eligibilityStatus.overall)}`}>
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-sm">
+                  <Shield className="w-4 h-4" />
+                  PM Internship Eligibility Status
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Overall Status:</span>
+                    <div className="flex items-center gap-1">
+                      {getEligibilityIcon(eligibilityStatus.overall)}
+                      <Badge variant={eligibilityStatus.overall === 'eligible' ? 'default' : 
+                                   eligibilityStatus.overall === 'not-eligible' ? 'destructive' : 'secondary'}>
+                        {eligibilityStatus.overall === 'eligible' ? 'Eligible' :
+                         eligibilityStatus.overall === 'not-eligible' ? 'Not Eligible' :
+                         eligibilityStatus.overall === 'partial' ? 'Partially Eligible' : 'Pending Verification'}
+                      </Badge>
+                    </div>
+                  </div>
+                  
+                  {/* Individual criteria */}
+                  <div className="text-xs space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span>Age (21-24):</span>
+                      {getEligibilityIcon(eligibilityStatus.age)}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Citizenship:</span>
+                      {getEligibilityIcon(eligibilityStatus.citizenship)}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Education:</span>
+                      {getEligibilityIcon(eligibilityStatus.education)}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Income (≤₹8L):</span>
+                      {getEligibilityIcon(eligibilityStatus.income)}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Employment Status:</span>
+                      {getEligibilityIcon(eligibilityStatus.employment)}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Family Status:</span>
+                      {getEligibilityIcon(eligibilityStatus.family)}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Previous Participation:</span>
+                      {getEligibilityIcon(eligibilityStatus.participation)}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Eligibility Issues and Warnings */}
+          {(eligibilityStatus.issues.length > 0 || eligibilityStatus.warnings.length > 0) && (
+            <div className="space-y-4 mb-6">
+              {eligibilityStatus.issues.length > 0 && (
+                <Alert className="border-red-200 bg-red-50">
+                  <XCircle className="h-4 w-4 text-red-600" />
+                  <AlertDescription className="text-red-800">
+                    <div className="font-medium mb-2">Eligibility Issues Found:</div>
+                    <ul className="list-disc list-inside space-y-1">
+                      {eligibilityStatus.issues.map((issue, index) => (
+                        <li key={index} className="text-sm">{issue}</li>
+                      ))}
+                    </ul>
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {eligibilityStatus.warnings.length > 0 && (
+                <Alert className="border-yellow-200 bg-yellow-50">
+                  <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                  <AlertDescription className="text-yellow-800">
+                    <div className="font-medium mb-2">Important Considerations:</div>
+                    <ul className="list-disc list-inside space-y-1">
+                      {eligibilityStatus.warnings.map((warning, index) => (
+                        <li key={index} className="text-sm">{warning}</li>
+                      ))}
+                    </ul>
+                  </AlertDescription>
+                </Alert>
+              )}
+            </div>
+          )}
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -116,9 +487,44 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="dateOfBirth">Date of Birth *</Label>
-                      <Input id="dateOfBirth" type="date" />
-                      <p className="text-xs text-gray-500">Must be between 18-30 years for PM Internship Scheme</p>
+                      <Input 
+                        id="dateOfBirth" 
+                        type="date" 
+                        value={formData.dateOfBirth}
+                        onChange={(e) => updateFormData('dateOfBirth', e.target.value)}
+                        className={eligibilityStatus.age === 'not-eligible' ? 'border-red-500' : ''}
+                      />
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs text-gray-500">Must be between 21-24 years for PM Internship Scheme</p>
+                        {formData.dateOfBirth && getEligibilityIcon(eligibilityStatus.age)}
+                      </div>
+                      {formData.dateOfBirth && calculateAge(formData.dateOfBirth) !== null && (
+                        <p className="text-xs text-gray-600">Current age: {calculateAge(formData.dateOfBirth)} years</p>
+                      )}
                     </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="citizenship">Citizenship *</Label>
+                      <Select 
+                        value={formData.citizenship} 
+                        onValueChange={(value: string) => updateFormData('citizenship', value)}
+                      >
+                        <SelectTrigger className={eligibilityStatus.citizenship === 'not-eligible' ? 'border-red-500' : ''}>
+                          <SelectValue placeholder="Select citizenship" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="indian">Indian Citizen</SelectItem>
+                          <SelectItem value="nri">NRI (Non-Resident Indian)</SelectItem>
+                          <SelectItem value="foreign">Foreign National</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs text-gray-500">Only Indian citizens are eligible</p>
+                        {formData.citizenship && getEligibilityIcon(eligibilityStatus.citizenship)}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="gender">Gender *</Label>
                       <Select>
@@ -132,6 +538,25 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                           <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
                       </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="currentlyEmployed">Employment Status *</Label>
+                      <Select 
+                        value={formData.currentlyEmployed ? 'employed' : 'unemployed'} 
+                        onValueChange={(value: string) => updateFormData('currentlyEmployed', value === 'employed')}
+                      >
+                        <SelectTrigger className={eligibilityStatus.employment === 'not-eligible' ? 'border-red-500' : ''}>
+                          <SelectValue placeholder="Select employment status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="unemployed">Not Currently Employed</SelectItem>
+                          <SelectItem value="employed">Currently Employed</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs text-gray-500">Must not be currently employed</p>
+                        {getEligibilityIcon(eligibilityStatus.employment)}
+                      </div>
                     </div>
                   </div>
 
@@ -205,8 +630,8 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
 
                   <div className="space-y-2">
                     <Label htmlFor="category">Category *</Label>
-                    <Select>
-                      <SelectTrigger>
+                    <Select value={formData.category} onValueChange={(value: string) => updateFormData('category', value)}>
+                      <SelectTrigger className={eligibilityStatus.income === 'not-eligible' ? 'border-red-500' : ''}>
                         <SelectValue placeholder="Select your category" />
                       </SelectTrigger>
                       <SelectContent>
@@ -217,6 +642,9 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                         <SelectItem value="ews">EWS (Economically Weaker Section)</SelectItem>
                       </SelectContent>
                     </Select>
+                    {formData.category === 'ews' && (
+                      <p className="text-xs text-blue-600">EWS category requires family income verification below ₹8 Lakh per annum</p>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -242,25 +670,28 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Home className="w-5 h-5 text-primary" />
-                    Family Background (Optional)
+                    Family Background *
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="fatherOccupation">Father's Occupation</Label>
+                      <Label htmlFor="fatherOccupation">Father's Occupation * </Label>
                       <Input id="fatherOccupation" placeholder="e.g., Farmer, Teacher, Business" />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="motherOccupation">Mother's Occupation</Label>
+                      <Label htmlFor="motherOccupation">Mother's Occupation * </Label>
                       <Input id="motherOccupation" placeholder="e.g., Homemaker, Nurse, etc." />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="familyIncome">Annual Family Income</Label>
-                    <Select>
-                      <SelectTrigger>
+                    <Label htmlFor="familyIncome">Annual Family Income * </Label>
+                    <Select 
+                      value={formData.familyIncome} 
+                      onValueChange={(value: string) => updateFormData('familyIncome', value)}
+                    >
+                      <SelectTrigger className={eligibilityStatus.income === 'not-eligible' ? 'border-red-500' : ''}>
                         <SelectValue placeholder="Select income range" />
                       </SelectTrigger>
                       <SelectContent>
@@ -272,23 +703,31 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                         <SelectItem value="above-15-lakh">Above ₹15 Lakh</SelectItem>
                       </SelectContent>
                     </Select>
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs text-gray-500">Required for EWS category verification</p>
+                      {formData.familyIncome && formData.category && getEligibilityIcon(eligibilityStatus.income)}
+                    </div>
                   </div>
 
                   <div className="flex items-center space-x-2">
                     <Checkbox id="govtEmployee" />
                     <Label htmlFor="govtEmployee">
-                      Is there a government employee in your immediate family?
+                      Is there a government employee in your immediate family? *
                     </Label>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="govtEmployeeDetails">If yes, provide details</Label>
+                    <Label htmlFor="govtEmployeeDetails">If yes, provide details * </Label>
                     <Input id="govtEmployeeDetails" placeholder="e.g., Father - State Government Teacher" />
                   </div>
                 </CardContent>
               </Card>
 
-              <Button onClick={() => saveSection('personal')} className="w-full">
+              <Button 
+                onClick={() => saveSection('personal')} 
+                className="w-full"
+                disabled={eligibilityStatus.overall === 'not-eligible'}
+              >
                 <Save className="w-4 h-4 mr-2" />
                 Save Personal & Demographic Information
               </Button>
@@ -309,8 +748,11 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="highestDegree">Highest Degree/Qualification *</Label>
-                    <Select>
-                      <SelectTrigger>
+                    <Select 
+                      value={formData.highestDegree} 
+                      onValueChange={(value: string) => updateFormData('highestDegree', value)}
+                    >
+                      <SelectTrigger className={eligibilityStatus.education === 'not-eligible' ? 'border-red-500' : ''}>
                         <SelectValue placeholder="Select highest qualification" />
                       </SelectTrigger>
                       <SelectContent>
@@ -333,6 +775,10 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                         <SelectItem value="phd">Ph.D</SelectItem>
                       </SelectContent>
                     </Select>
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs text-gray-500">PhD holders are not eligible for this scheme</p>
+                      {formData.highestDegree && getEligibilityIcon(eligibilityStatus.education)}
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="institution">University/Institution *</Label>
@@ -394,7 +840,17 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="cgpa">CGPA/Percentage *</Label>
-                    <Input id="cgpa" placeholder="8.5 CGPA or 85%" />
+                    <Input 
+                      id="cgpa" 
+                      placeholder="8.5 CGPA or 85%" 
+                      value={formData.cgpa}
+                      onChange={(e) => updateFormData('cgpa', e.target.value)}
+                      className={eligibilityStatus.academic === 'not-eligible' ? 'border-red-500' : ''}
+                    />
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs text-gray-500">Minimum 50% marks required</p>
+                      {formData.cgpa && getEligibilityIcon(eligibilityStatus.academic)}
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="graduationYear">Year of Completion/Expected Graduation *</Label>
@@ -425,7 +881,13 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="class12Marks">Class 12th Marks/Percentage *</Label>
-                      <Input id="class12Marks" placeholder="92%" />
+                      <Input 
+                        id="class12Marks" 
+                        placeholder="92%" 
+                        value={formData.class12Marks}
+                        onChange={(e) => updateFormData('class12Marks', e.target.value)}
+                        className={eligibilityStatus.academic === 'not-eligible' ? 'border-red-500' : ''}
+                      />
                     </div>
                   </div>
                   
@@ -453,7 +915,11 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                   </div>
                 </div>
 
-                <Button onClick={() => saveSection('education')} className="w-full">
+                <Button 
+                  onClick={() => saveSection('education')} 
+                  className="w-full"
+                  disabled={eligibilityStatus.overall === 'not-eligible'}
+                >
                   <Save className="w-4 h-4 mr-2" />
                   Save Educational Background
                 </Button>
@@ -461,7 +927,6 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
             </Card>
           </TabsContent>
 
-         
           {/* Experience */}
           <TabsContent value="experience">
             <div className="space-y-6">
@@ -479,29 +944,45 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                     <AlertTriangle className="h-4 w-4" />
                     <AlertDescription>
                       This information helps prioritize new candidates to distribute benefits more broadly across the population.
+                      Previous participation in PM-level schemes may affect eligibility.
                     </AlertDescription>
                   </Alert>
 
                   <div className="space-y-4">
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="pmInternshipPrevious" />
-                      <Label htmlFor="pmInternshipPrevious">
+                      <Checkbox 
+                        id="pmInternshipPrevious" 
+                        checked={formData.pmInternshipPrevious}
+                        onCheckedChange={(checked: boolean | undefined) => updateFormData('pmInternshipPrevious', !!checked)}
+                      />
+                      <Label htmlFor="pmInternshipPrevious" className={formData.pmInternshipPrevious ? 'text-red-600' : ''}>
                         Have you previously participated in any PM-level internship scheme?
                       </Label>
+                      {formData.pmInternshipPrevious && <XCircle className="w-4 h-4 text-red-600" />}
                     </div>
 
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="pmSkillingPrevious" />
-                      <Label htmlFor="pmSkillingPrevious">
+                      <Checkbox 
+                        id="pmSkillingPrevious" 
+                        checked={formData.pmSkillingPrevious}
+                        onCheckedChange={(checked: boolean | undefined) => updateFormData('pmSkillingPrevious', !!checked)}
+                      />
+                      <Label htmlFor="pmSkillingPrevious" className={formData.pmSkillingPrevious ? 'text-red-600' : ''}>
                         Have you previously participated in any PM-level skilling scheme?
                       </Label>
+                      {formData.pmSkillingPrevious && <XCircle className="w-4 h-4 text-red-600" />}
                     </div>
 
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="otherGovtScheme" />
-                      <Label htmlFor="otherGovtScheme">
+                      <Checkbox 
+                        id="otherGovtScheme" 
+                        checked={formData.otherGovtScheme}
+                        onCheckedChange={(checked: boolean | undefined) => updateFormData('otherGovtScheme', !!checked)}
+                      />
+                      <Label htmlFor="otherGovtScheme" className={formData.otherGovtScheme ? 'text-yellow-600' : ''}>
                         Have you participated in any other government employment/training scheme?
                       </Label>
+                      {formData.otherGovtScheme && <AlertTriangle className="w-4 h-4 text-yellow-600" />}
                     </div>
                   </div>
 
@@ -512,6 +993,11 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                       placeholder="Name of scheme, year of participation, duration, outcome, etc."
                       rows={3}
                     />
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs text-gray-500">Previous participation status:</p>
+                    {getEligibilityIcon(eligibilityStatus.participation)}
                   </div>
                 </CardContent>
               </Card>
@@ -573,187 +1059,82 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                 </CardContent>
               </Card>
 
-              {/* Projects & Portfolio */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Code className="w-5 h-5 text-primary" />
-                    Projects & Portfolio
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="projectName">Project Name</Label>
-                      <Input id="projectName" placeholder="E-commerce Website" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="projectType">Project Type</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="personal">Personal Project</SelectItem>
-                          <SelectItem value="academic">Academic Project</SelectItem>
-                          <SelectItem value="internship">Internship Project</SelectItem>
-                          <SelectItem value="freelance">Freelance Work</SelectItem>
-                          <SelectItem value="open-source">Open Source Contribution</SelectItem>
-                          <SelectItem value="competition">Competition/Hackathon</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="projectDescription">Project Description</Label>
-                    <Textarea 
-                      id="projectDescription" 
-                      placeholder="Describe the project, its purpose, your role, and impact"
-                      rows={4}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="technologies">Technologies/Skills Used</Label>
-                      <Input id="technologies" placeholder="React, Node.js, MongoDB, Python" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="projectDuration">Duration</Label>
-                      <Input id="projectDuration" placeholder="3 months" />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="projectUrl">Project URL/Demo</Label>
-                      <Input id="projectUrl" placeholder="https://myproject.com" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="githubUrl">GitHub Repository</Label>
-                      <Input id="githubUrl" placeholder="https://github.com/username/project" />
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  <div>
-                    <h4 className="font-medium mb-4">Portfolio & Social Links</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="portfolioWebsite">Portfolio Website</Label>
-                        <Input id="portfolioWebsite" placeholder="https://myportfolio.com" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="linkedinProfile">LinkedIn Profile</Label>
-                        <Input id="linkedinProfile" placeholder="https://linkedin.com/in/username" />
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Button onClick={() => saveSection('experience')} className="w-full">
+              <Button 
+                onClick={() => saveSection('experience')} 
+                className="w-full"
+                disabled={eligibilityStatus.overall === 'not-eligible'}
+              >
                 <Save className="w-4 h-4 mr-2" />
-                Save Experience & Projects
+                Save Experience Information
               </Button>
             </div>
           </TabsContent>
 
-
-
-          {/* Skills & Preferences */}
+          {/* Skills */}
           <TabsContent value="skills">
-            <div className="space-y-6">
-              {/* Skills */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Code className="w-5 h-5 text-primary" />
-                    Skills & Competencies
-                    {isSectionSaved('skills') && <Check className="w-4 h-4 text-green-600" />}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div>
-                    <h4 className="font-medium mb-4">Your Skills</h4>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {skills.map((skill, index) => (
-                        <Badge key={index} variant="secondary" className="px-3 py-1">
-                          {skill}
-                          <button
-                            onClick={() => removeSkill(skill)}
-                            className="ml-2 text-gray-400 hover:text-gray-600"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                    <div className="flex gap-2">
-                      <Input
-                        value={newSkill}
-                        onChange={(e) => setNewSkill(e.target.value)}
-                        placeholder="Add a new skill"
-                        onKeyPress={(e) => e.key === 'Enter' && addSkill()}
-                      />
-                      <Button onClick={addSkill} variant="outline">
-                        <Plus className="w-4 h-4" />
-                      </Button>
-                    </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Code className="w-5 h-5 text-primary" />
+                  Skills & Competencies
+                  {isSectionSaved('skills') && <Check className="w-4 h-4 text-green-600" />}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Current Skills */}
+                <div>
+                  <Label className="text-base font-medium">Your Skills</Label>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {skills.map((skill, index) => (
+                      <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                        {skill}
+                        <X 
+                          className="w-3 h-3 cursor-pointer hover:text-red-500" 
+                          onClick={() => removeSkill(skill)}
+                        />
+                      </Badge>
+                    ))}
                   </div>
+                </div>
 
-                  <Separator />
+                {/* Add New Skill */}
+                <div className="flex gap-2">
+                  <Input 
+                    placeholder="Add a skill"
+                    value={newSkill}
+                    onChange={(e) => setNewSkill(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && addSkill()}
+                  />
+                  <Button onClick={addSkill} size="sm">
+                    <Plus className="w-4 h-4" />
+                    Add
+                  </Button>
+                </div>
 
-                  <div>
-                    <h4 className="font-medium mb-4">Hard Skills (Technical)</h4>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                      {[
-                        'JavaScript', 'Python', 'Java', 'C++', 'React', 'Node.js', 'Django', 'Flask',
-                        'Machine Learning', 'Data Science', 'SQL', 'MongoDB', 'AWS', 'Git', 'Docker',
-                        'Figma', 'Adobe Photoshop', 'AutoCAD', 'Excel', 'PowerBI', 'Tableau'
-                      ].map((skill) => (
-                        <div key={skill} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={skill}
-                            checked={skills.includes(skill)}
-                            onCheckedChange={() => toggleCommonSkill(skill)}
-                          />
-                          <Label htmlFor={skill} className="text-sm cursor-pointer">
-                            {skill}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
+                {/* Common Skills */}
+                <div>
+                  <Label className="text-base font-medium">Quick Add Popular Skills</Label>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {commonSkills.map((skill, index) => (
+                      <Badge 
+                        key={index} 
+                        variant={skills.includes(skill) ? "default" : "outline"}
+                        className="cursor-pointer"
+                        onClick={() => toggleCommonSkill(skill)}
+                      >
+                        {skill}
+                        {skills.includes(skill) && <Check className="w-3 h-3 ml-1" />}
+                      </Badge>
+                    ))}
                   </div>
+                </div>
 
-                  <Separator />
-
-                  <div>
-                    <h4 className="font-medium mb-4">Soft Skills</h4>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      {[
-                        'Communication', 'Leadership', 'Problem Solving', 'Teamwork', 'Project Management',
-                        'Public Speaking', 'Critical Thinking', 'Time Management', 'Adaptability', 'Creativity',
-                        'Analytical Thinking', 'Negotiation'
-                      ].map((skill) => (
-                        <div key={skill} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={skill}
-                            checked={skills.includes(skill)}
-                            onCheckedChange={() => toggleCommonSkill(skill)}
-                          />
-                          <Label htmlFor={skill} className="text-sm cursor-pointer">
-                            {skill}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                <Button onClick={() => saveSection('skills')} className="w-full">
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Skills & Competencies
+                </Button>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Preferences */}
@@ -761,280 +1142,252 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-primary" />
-                  Location, Role & Industry Preferences
+                  <Award className="w-5 h-5 text-primary" />
+                  Internship Preferences
                   {isSectionSaved('preferences') && <Check className="w-4 h-4 text-green-600" />}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div>
-                  <h4 className="font-medium mb-4">Preferred Work Locations</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {[
-                      'Mumbai', 'Delhi/NCR', 'Bangalore', 'Hyderabad', 'Chennai', 'Pune', 
-                      'Kolkata', 'Ahmedabad', 'Jaipur', 'Lucknow', 'Bhopal', 'Remote Work'
-                    ].map((city) => (
-                      <div key={city} className="flex items-center space-x-2">
-                        <Checkbox id={city} />
-                        <Label htmlFor={city} className="text-sm cursor-pointer">
-                          {city}
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="preferredDomain">Preferred Domain/Field *</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select preferred domain" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="technology">Technology & Software</SelectItem>
+                      <SelectItem value="finance">Finance & Banking</SelectItem>
+                      <SelectItem value="marketing">Marketing & Digital Media</SelectItem>
+                      <SelectItem value="design">Design & Creative</SelectItem>
+                      <SelectItem value="data-science">Data Science & Analytics</SelectItem>
+                      <SelectItem value="consulting">Consulting</SelectItem>
+                      <SelectItem value="healthcare">Healthcare</SelectItem>
+                      <SelectItem value="education">Education</SelectItem>
+                      <SelectItem value="manufacturing">Manufacturing</SelectItem>
+                      <SelectItem value="retail">Retail & E-commerce</SelectItem>
+                      <SelectItem value="telecommunication">Telecommunications</SelectItem>
+                      <SelectItem value="media">Media & Entertainment</SelectItem>
+                      <SelectItem value="automotive">Automotive</SelectItem>
+                      <SelectItem value="real estate">Real Estate & Construction</SelectItem>
+                      <SelectItem value="fmcg">FMCG (Fast Moving Consumer Goods</SelectItem>
+                      <SelectItem value="energy">Energy & Utilities</SelectItem>
+                      <SelectItem value="transportation">Transportation & Logistics</SelectItem>
+                      <SelectItem value="agriculture">Agriculture & Food Processing</SelectItem>
+                      <SelectItem value="textiles">Textiles & Apparel</SelectItem>
+                      <SelectItem value="tourism">Tourism & Hospitality</SelectItem>
+                      <SelectItem value="chemical">Chemical & Petrochemicals</SelectItem>
+                      <SelectItem value="aerospace">Aerospace & Defence</SelectItem>
+                      <SelectItem value="mining">Mining & Metals</SelectItem>
+                      <SelectItem value="gov & public sector">Government & Public Sector</SelectItem>
+                      <SelectItem value="ngo">NGO & Social Sector</SelectItem>
+                      <SelectItem value="research">Research & Developement Sector</SelectItem>
+                      <SelectItem value="startups">Startups & Innovation</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <Separator />
-
-                <div>
-                  <h4 className="font-medium mb-4">Preferred Industries</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {[
-                      'Information Technology', 'Banking & Finance', 'Healthcare & Pharmaceuticals', 
-                      'E-commerce & Retail', 'Media & Entertainment', 'Education & EdTech',
-                      'Management Consulting', 'Manufacturing', 'Automotive', 'Real Estate', 
-                      'FMCG', 'Startups', 'Government/Public Sector', 'NGO/Social Sector',
-                      'Telecommunications', 'Energy & Utilities'
-                    ].map((industry) => (
-                      <div key={industry} className="flex items-center space-x-2">
-                        <Checkbox id={industry} />
-                        <Label htmlFor={industry} className="text-sm cursor-pointer">
-                          {industry}
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="preferredLocation">Preferred Location *</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select preferred location" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="mumbai">Mumbai</SelectItem>
+                      <SelectItem value="delhi">Delhi/NCR</SelectItem>
+                      <SelectItem value="bangalore">Bangalore</SelectItem>
+                      <SelectItem value="hyderabad">Hyderabad</SelectItem>
+                      <SelectItem value="pune">Pune</SelectItem>
+                      <SelectItem value="chennai">Chennai</SelectItem>
+                      <SelectItem value="kolkata">Kolkata</SelectItem>
+                      <SelectItem value="ahmedabad">Ahmedabad</SelectItem>
+                      <SelectItem value="remote">Remote/Work from Home</SelectItem>
+                      <SelectItem value="anywhere">Open to any location</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <Separator />
-
-                <div>
-                  <h4 className="font-medium mb-4">Preferred Role Categories</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {[
-                      'Software Development & Engineering', 'Data Science & Analytics', 
-                      'Product Management', 'UI/UX Design', 'Digital Marketing',
-                      'Business Development', 'Finance & Accounting', 'Operations & Supply Chain', 
-                      'Human Resources', 'Research & Development', 'Content Writing & Communication',
-                      'Sales & Customer Success', 'Legal & Compliance', 'Quality Assurance',
-                      'Project Management', 'Business Analysis'
-                    ].map((role) => (
-                      <div key={role} className="flex items-center space-x-2">
-                        <Checkbox id={role} />
-                        <Label htmlFor={role} className="text-sm cursor-pointer">
-                          {role}
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="internshipDuration">Preferred Duration</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select duration" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="3-months">3 Months</SelectItem>
+                      <SelectItem value="6-months">6 Months</SelectItem>
+                      <SelectItem value="12-months">12 Months (PM Scheme Standard)</SelectItem>
+                      <SelectItem value="flexible">Flexible</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <Separator />
-
-                <div>
-                  <h4 className="font-medium mb-4">Work Preferences</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="workMode">Preferred Work Mode</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select work mode" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="onsite">On-site</SelectItem>
-                          <SelectItem value="remote">Remote</SelectItem>
-                          <SelectItem value="hybrid">Hybrid</SelectItem>
-                          <SelectItem value="flexible">Flexible/Any</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="internshipDuration">Preferred Internship Duration</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select duration" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1-3-months">1-3 months</SelectItem>
-                          <SelectItem value="3-6-months">3-6 months</SelectItem>
-                          <SelectItem value="6-12-months">6-12 months</SelectItem>
-                          <SelectItem value="flexible">Flexible</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="expectedStipend">Expected Monthly Stipend</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select stipend range" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5000-10000">₹5,000 - ₹10,000</SelectItem>
+                      <SelectItem value="10000-15000">₹10,000 - ₹15,000</SelectItem>
+                      <SelectItem value="15000-25000">₹15,000 - ₹25,000</SelectItem>
+                      <SelectItem value="25000-35000">₹25,000 - ₹35,000</SelectItem>
+                      <SelectItem value="35000+">₹35,000+</SelectItem>
+                      <SelectItem value="negotiable">Negotiable</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <Button onClick={() => saveSection('preferences')} className="w-full">
                   <Save className="w-4 h-4 mr-2" />
-                  Save Preferences
+                  Save Internship Preferences
                 </Button>
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* Documents & Additional Information */}
+          {/* Documents */}
           <TabsContent value="documents">
-            <div className="space-y-6">
-              {/* Resume Upload */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Upload className="w-5 h-5 text-primary" />
-                    Resume/CV Upload
-                    <span className="text-red-500">*</span>
-                    {isSectionSaved('documents') && <Check className="w-4 h-4 text-green-600" />}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <Alert>
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertDescription>
-                      Your resume is mandatory for the PM Internship Scheme application. Please ensure it's updated and professional.
-                    </AlertDescription>
-                  </Alert>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Upload className="w-5 h-5 text-primary" />
+                  Required Documents
+                  {isSectionSaved('documents') && <Check className="w-4 h-4 text-green-600" />}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <Alert>
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    Upload clear, legible copies of all required documents. All documents should be in PDF or image format (JPG, PNG).
+                  </AlertDescription>
+                </Alert>
 
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                    <Upload className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-                    <p className="text-gray-600 mb-2">
-                      Drag and drop your resume here, or click to browse
-                    </p>
-                    <p className="text-sm text-gray-500 mb-4">
-                      Supported formats: PDF, DOC, DOCX (Max 5MB)
-                    </p>
-                    <Button variant="outline">
-                      Choose File
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Additional Qualifications */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Award className="w-5 h-5 text-primary" />
-                    Additional Qualifications
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div>
-                    <h4 className="font-medium mb-4">Certifications & Awards</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="certificationName">Certification/Award Name</Label>
-                        <Input id="certificationName" placeholder="e.g., AWS Certified Solutions Architect" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="issuingOrganization">Issuing Organization</Label>
-                        <Input id="issuingOrganization" placeholder="e.g., Amazon Web Services" />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="issueDate">Issue Date</Label>
-                        <Input id="issueDate" type="month" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="credentialId">Credential ID (if applicable)</Label>
-                        <Input id="credentialId" placeholder="Certificate verification ID" />
-                      </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Aadhaar Card *</Label>
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                      <Upload className="w-6 h-6 mx-auto mb-2 text-gray-400" />
+                      <p className="text-sm text-gray-600">Click to upload Aadhaar Card</p>
                     </div>
                   </div>
 
-                  <Separator />
-
-                  <div>
-                    <h4 className="font-medium mb-4">Language Proficiency</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="nativeLanguage">Native/Mother Tongue</Label>
-                        <Select>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select native language" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="hindi">Hindi</SelectItem>
-                            <SelectItem value="english">English</SelectItem>
-                            <SelectItem value="bengali">Bengali</SelectItem>
-                            <SelectItem value="telugu">Telugu</SelectItem>
-                            <SelectItem value="marathi">Marathi</SelectItem>
-                            <SelectItem value="tamil">Tamil</SelectItem>
-                            <SelectItem value="gujarati">Gujarati</SelectItem>
-                            <SelectItem value="urdu">Urdu</SelectItem>
-                            <SelectItem value="kannada">Kannada</SelectItem>
-                            <SelectItem value="malayalam">Malayalam</SelectItem>
-                            <SelectItem value="punjabi">Punjabi</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="englishProficiency">English Proficiency Level</Label>
-                        <Select>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select proficiency" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="native">Native</SelectItem>
-                            <SelectItem value="fluent">Fluent</SelectItem>
-                            <SelectItem value="intermediate">Intermediate</SelectItem>
-                            <SelectItem value="basic">Basic</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <div className="space-y-2 mt-4">
-                      <Label htmlFor="otherLanguages">Other Languages (with proficiency levels)</Label>
-                      <Input id="otherLanguages" placeholder="e.g., Tamil (Fluent), Spanish (Basic)" />
+                  <div className="space-y-2">
+                    <Label>Educational Certificates *</Label>
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                      <Upload className="w-6 h-6 mx-auto mb-2 text-gray-400" />
+                      <p className="text-sm text-gray-600">Upload degree/marksheets</p>
                     </div>
                   </div>
 
-                  <Separator />
-
-                  <div>
-                    <h4 className="font-medium mb-4">Extra-Curricular Activities & Achievements</h4>
-                    <Textarea 
-                      placeholder="Sports achievements, cultural activities, leadership positions, volunteer work, social service, etc."
-                      rows={4}
-                    />
+                  <div className="space-y-2">
+                    <Label>Category Certificate</Label>
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                      <Upload className="w-6 h-6 mx-auto mb-2 text-gray-400" />
+                      <p className="text-sm text-gray-600">SC/ST/OBC/EWS certificate</p>
+                    </div>
                   </div>
 
-                  <Separator />
-
-                  <div>
-                    <h4 className="font-medium mb-4">Additional Information</h4>
-                    <Textarea 
-                      placeholder="Any other relevant information you'd like to share (hobbies, interests, achievements, etc.)"
-                      rows={3}
-                    />
+                  <div className="space-y-2">
+                    <Label>Income Certificate</Label>
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                      <Upload className="w-6 h-6 mx-auto mb-2 text-gray-400" />
+                      <p className="text-sm text-gray-600">Family income certificate</p>
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
 
-              <Button onClick={() => saveSection('documents')} className="w-full">
-                <Save className="w-4 h-4 mr-2" />
-                Save Documents & Additional Information
-              </Button>
-            </div>
+                  <div className="space-y-2">
+                    <Label>Resume/CV *</Label>
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                      <Upload className="w-6 h-6 mx-auto mb-2 text-gray-400" />
+                      <p className="text-sm text-gray-600">Upload your latest resume</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Passport Size Photo *</Label>
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                      <Upload className="w-6 h-6 mx-auto mb-2 text-gray-400" />
+                      <p className="text-sm text-gray-600">Recent passport size photo</p>
+                    </div>
+                  </div>
+                </div>
+
+                <Button onClick={() => saveSection('documents')} className="w-full">
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Documents
+                </Button>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
 
-        {/* Action Buttons */}
-        <div className="flex justify-between mt-8">
-          <Button variant="outline" onClick={() => onNavigate('candidate-dashboard')}>
-            Save as Draft
-          </Button>
-          <Button 
-            className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
-            onClick={() => {
-              toast.success('Profile completed successfully! You are now eligible for PM Internship Scheme matching.');
-              onNavigate('candidate-dashboard');
-            }}
-          >
-            Submit for PM Internship Scheme
-          </Button>
-        </div>
+        {/* Final Submission */}
+        {savedSections.length >= 3 && (
+          <Card className="mt-8">
+            <CardContent className="pt-6">
+              <div className="text-center space-y-4">
+                <h3 className="text-lg font-semibold">Profile Completion Status</h3>
+                <div className="flex justify-center space-x-4">
+                  <Badge variant={savedSections.includes('personal') ? 'default' : 'secondary'}>
+                    Personal Information {savedSections.includes('personal') && <Check className="w-3 h-3 ml-1" />}
+                  </Badge>
+                  <Badge variant={savedSections.includes('education') ? 'default' : 'secondary'}>
+                    Education {savedSections.includes('education') && <Check className="w-3 h-3 ml-1" />}
+                  </Badge>
+                  <Badge variant={savedSections.includes('experience') ? 'default' : 'secondary'}>
+                    Experience {savedSections.includes('experience') && <Check className="w-3 h-3 ml-1" />}
+                  </Badge>
+                </div>
+                
+                {eligibilityStatus.overall === 'eligible' ? (
+                  <Button 
+                    size="lg" 
+                    className="bg-green-600 hover:bg-green-700"
+                    onClick={async () => {
+                      // Build payload consisting only of backend-required keys
+                      const backendKeys = Object.keys(initialCandidateData);
+                      const payload: Record<string, any> = {};
+                      backendKeys.forEach((key) => {
+                        // If the formData has the key use it, otherwise fallback to the initialCandidateData default
+                        // @ts-ignore - dynamic keys
+                        payload[key] = (formData as any)[key] ?? (initialCandidateData as any)[key];
+                      });
+
+                      try {
+                        await axios.post('http://localhost:5000/api/candidate/data', payload);
+                        toast.success('Profile submitted successfully! You are eligible for PM Internship Scheme.');
+                        onNavigate('candidate-dashboard');
+                      } catch (err) {
+                        console.error('Error submitting candidate data', err);
+                        toast.error('Error submitting data. Please try again later.');
+                      }
+                    }}
+                  >
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Submit Profile & Apply for Internships
+                  </Button>
+                ) : (
+                  <div className="space-y-2">
+                    <Button 
+                      size="lg" 
+                      variant="secondary"
+                      disabled
+                    >
+                      <XCircle className="w-4 h-4 mr-2" />
+                      Profile Incomplete or Eligibility Issues
+                    </Button>
+                    <p className="text-sm text-gray-600">
+                      Please address the eligibility issues shown above before submitting your profile.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
