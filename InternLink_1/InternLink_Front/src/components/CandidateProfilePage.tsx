@@ -68,6 +68,20 @@ interface FormData {
   currentlyEmployed: boolean;
   govtEmployee: boolean;
   citizenship: string;
+  // Personal required fields
+  fullName?: string;
+  gender?: string;
+  email?: string;
+  phone?: string;
+  currentAddress?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  // Education additional required
+  graduationYear?: string;
+  // Preferences required
+  preferredDomain?: string;
+  preferredLocation?: string;
 }
 
 export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) {
@@ -89,7 +103,18 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
     natsNapsTraining: false,
     currentlyEmployed: false,
     govtEmployee: false,
-    citizenship: ''
+    citizenship: '',
+    fullName: '',
+    gender: '',
+    email: '',
+    phone: '',
+    currentAddress: '',
+    city: '',
+    state: '',
+    pincode: '',
+    graduationYear: '',
+    preferredDomain: '',
+    preferredLocation: ''
   });
   const [eligibilityStatus, setEligibilityStatus] = useState<EligibilityStatus>({
     overall: 'pending',
@@ -350,7 +375,16 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
   };
 
   const saveSection = (section: string) => {
-    setSavedSections([...savedSections, section]);
+    // don't double-save
+    if (savedSections.includes(section)) {
+      toast('Section already saved', {icon: <Check />});
+      return;
+    }
+
+    const ok = validateSectionRequired(section);
+    if (!ok) return;
+
+    setSavedSections(prev => [...prev, section]);
     toast.success(`${section} section saved successfully!`);
   };
 
@@ -380,6 +414,42 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
       default:
         return 'text-gray-600 bg-gray-50 border-gray-200';
     }
+  };
+
+  // Validate required fields per section (starred fields)
+  const validateSectionRequired = (section: string) => {
+    const missing: string[] = [];
+    const pushIfMissing = (key: keyof FormData, label: string) => {
+      const v = (formData as any)[key];
+      if (v === undefined || v === null || String(v).trim() === '') missing.push(label);
+    };
+
+    if (section === 'personal') {
+      pushIfMissing('fullName', 'Full Name');
+      pushIfMissing('dateOfBirth', 'Date of Birth');
+      pushIfMissing('citizenship', 'Citizenship');
+      pushIfMissing('gender', 'Gender');
+      pushIfMissing('email', 'Email');
+      pushIfMissing('phone', 'Mobile Number');
+      pushIfMissing('currentAddress', 'Current Address');
+      pushIfMissing('city', 'City');
+      pushIfMissing('state', 'State');
+      pushIfMissing('pincode', 'PIN Code');
+    } else if (section === 'education') {
+      pushIfMissing('highestDegree', 'Highest Degree');
+      pushIfMissing('institution', 'Institution');
+      pushIfMissing('cgpa', 'CGPA/Percentage');
+      pushIfMissing('graduationYear', 'Graduation Year');
+    } else if (section === 'preferences') {
+      pushIfMissing('preferredDomain', 'Preferred Domain/Field');
+      pushIfMissing('preferredLocation', 'Preferred Location');
+    }
+
+    if (missing.length > 0) {
+      toast.error(`Please fill required fields: ${missing.join(', ')}`);
+      return false;
+    }
+    return true;
   };
 
   return (
