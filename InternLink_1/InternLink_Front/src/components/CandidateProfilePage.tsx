@@ -371,10 +371,13 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
 
 //variables storing if the below said information is filled or not
 // add the validation for form filling eligibility here
-const isPersonalComplete = !!formData.dateOfBirth && !!formData.category && !!formData.familyIncome;
+const isPersonalComplete = !!formData.dateOfBirth && !!formData.category && !!formData.familyIncome;// we should just make a function out of this no?
 const isEducationComplete = !!formData.highestDegree && !!formData.institution && !! formData.cgpa && !! formData.class12Marks;
+// basically making a function and returning True false as per validation would give a little better flexibility 
 const isSkillsComplete = true; //just a jugaad for now, need to add validation later
 const isExperienceComplete = true; //again just a jugaad need to add validation later
+const isPreferncesComplete = true; //again just a jugaad need to add validation later
+const isDocsComplete = true; // do i need to type alladat again
 
 const profileComplete = isPersonalComplete && isEducationComplete;
 
@@ -1196,7 +1199,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                 <CardTitle className="flex items-center gap-2">
                   <Award className="w-5 h-5 text-primary" />
                   Internship Preferences
-                  {isSectionSaved('preferences') && <Check className="w-4 h-4 text-green-600" />}
+                  {isPreferncesComplete && <Check className="w-4 h-4 text-green-600" />}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -1221,7 +1224,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                       <SelectItem value="media">Media & Entertainment</SelectItem>
                       <SelectItem value="automotive">Automotive</SelectItem>
                       <SelectItem value="real estate">Real Estate & Construction</SelectItem>
-                      <SelectItem value="fmcg">FMCG (Fast Moving Consumer Goods</SelectItem>
+                      <SelectItem value="fmcg">FMCG (Fast Moving Consumer Goods)</SelectItem>
                       <SelectItem value="energy">Energy & Utilities</SelectItem>
                       <SelectItem value="transportation">Transportation & Logistics</SelectItem>
                       <SelectItem value="agriculture">Agriculture & Food Processing</SelectItem>
@@ -1291,7 +1294,10 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                   </Select>
                 </div>
 
-                <Button onClick={() => saveSection('preferences')} className="w-full">
+                <Button
+                  onClick={() => console.log("Change me on line 1298 to add the navigate to NExt section maybe docs?")} 
+                  // onClick={() => saveSection('preferences')} className="w-full"
+                  >
                   <Save className="w-4 h-4 mr-2" />
                   Save Internship Preferences
                 </Button>
@@ -1306,7 +1312,8 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                 <CardTitle className="flex items-center gap-2">
                   <Upload className="w-5 h-5 text-primary" />
                   Required Documents
-                  {isSectionSaved('documents') && <Check className="w-4 h-4 text-green-600" />}
+                  {isDocsComplete && <Check className="w-4 h-4 text-green-600" />}
+                  {/* again this is for the check sign only i(sagar) replaced the similar line for all the sections */}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -1366,8 +1373,9 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                     </div>
                   </div>
                 </div>
-
-                <Button onClick={() => saveSection('documents')} className="w-full">
+                <Button onClick={() => console.log("Change me on line 962 to add the navigate to NExt section maybe experience?")}          
+                /* <Button onClick={() => saveSection('documents')}*/
+                 className="w-full">
                   <Save className="w-4 h-4 mr-2" />
                   Save Documents
                 </Button>
