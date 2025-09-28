@@ -1354,22 +1354,20 @@ const profileComplete = isPersonalComplete && isEducationComplete;
             </Card>
           </TabsContent>
         </Tabs>
-
         {/* Final Submission */}
-        {savedSections.length >= 3 && (
+        
+        
+        {profileComplete && (
           <Card className="mt-8">
             <CardContent className="pt-6">
               <div className="text-center space-y-4">
                 <h3 className="text-lg font-semibold">Profile Completion Status</h3>
                 <div className="flex justify-center space-x-4">
-                  <Badge variant={savedSections.includes('personal') ? 'default' : 'secondary'}>
-                    Personal Information {savedSections.includes('personal') && <Check className="w-3 h-3 ml-1" />}
+                  <Badge variant={isPersonalComplete ? 'default' : 'secondary'}>
+                    Personal Information {isPersonalComplete && <Check className="w-3 h-3 ml-1" />}
                   </Badge>
-                  <Badge variant={savedSections.includes('education') ? 'default' : 'secondary'}>
-                    Education {savedSections.includes('education') && <Check className="w-3 h-3 ml-1" />}
-                  </Badge>
-                  <Badge variant={savedSections.includes('experience') ? 'default' : 'secondary'}>
-                    Experience {savedSections.includes('experience') && <Check className="w-3 h-3 ml-1" />}
+                  <Badge variant={isEducationComplete ? 'default' : 'secondary'}>
+                    Education {isEducationComplete && <Check className="w-3 h-3 ml-1" />}
                   </Badge>
                 </div>
 
