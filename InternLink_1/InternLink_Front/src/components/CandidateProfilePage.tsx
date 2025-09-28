@@ -776,8 +776,10 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                       </SelectContent>
                     </Select>
                     <div className="flex items-center gap-2">
-                      <p className="text-xs text-gray-500">PhD holders are not eligible for this scheme</p>
-                      {formData.highestDegree && getEligibilityIcon(eligibilityStatus.education)}
+                      {formData.highestDegree === 'phd' && (
+                        <p className="text-xs text-gray-500">PhD holders are not eligible for this scheme</p>
+                      )}
+                      {eligibilityStatus.education === 'not-eligible' && getEligibilityIcon('not-eligible')}
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -848,8 +850,11 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                       className={eligibilityStatus.academic === 'not-eligible' ? 'border-red-500' : ''}
                     />
                     <div className="flex items-center gap-2">
-                      <p className="text-xs text-gray-500">Minimum 50% marks required</p>
-                      {formData.cgpa && getEligibilityIcon(eligibilityStatus.academic)}
+
+                      {formData.cgpa && Number(formData.cgpa)<=49 && (
+                        <p className="text-xs text-gray-500">Minimum 50% marks required</p>
+                      )}
+                      {eligibilityStatus.academic === 'not-eligible' && getEligibilityIcon('not-eligible')}
                     </div>
                   </div>
                   <div className="space-y-2">
