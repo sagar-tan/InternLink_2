@@ -373,6 +373,8 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
 // add the validation for form filling eligibility here
 const isPersonalComplete = !!formData.dateOfBirth && !!formData.category && !!formData.familyIncome;
 const isEducationComplete = !!formData.highestDegree && !!formData.institution && !! formData.cgpa && !! formData.class12Marks;
+const isSkillsComplete = true; //just a jugaad for now, need to add validation later
+const isExperienceComplete = true; //again just a jugaad need to add validation later
 
 const profileComplete = isPersonalComplete && isEducationComplete;
 
@@ -501,7 +503,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                   <CardTitle className="flex items-center gap-2">
                     <User className="w-5 h-5 text-primary" />
                     Personal Information
-                    {isSectionSaved('personal') && <Check className="w-4 h-4 text-green-600" />}
+                    {isPersonalComplete && <Check className="w-4 h-4 text-green-600" />}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -748,9 +750,17 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                   </div>
                 </CardContent>
               </Card>
+              
 
+
+              {/*This button is for Personal Section*/}
+
+
+
+              
               <Button 
-                onClick={() => saveSection('personal')} 
+                onClick={()=> console.log("Go to Education Section by clicking this")}
+                //onClick={() => saveSection('personal')} 
                 className="w-full"
                 disabled={eligibilityStatus.overall === 'not-eligible'}
               >
@@ -767,7 +777,9 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                 <CardTitle className="flex items-center gap-2">
                   <GraduationCap className="w-5 h-5 text-primary" />
                   Educational Background
-                  {isSectionSaved('education') && <Check className="w-4 h-4 text-green-600" />}
+                  {isEducationComplete && <Check className="w-4 h-4 text-green-600" />} 
+                  {/* this validation is for the check icon with the Title of the section */}
+                  {/* {isSectionSaved('education') && <Check className="w-4 h-4 text-green-600" />} */}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -945,9 +957,12 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                     </div>
                   </div>
                 </div>
-
+                
+                {/*This button is for Personal Section*/}
+                
                 <Button 
-                  onClick={() => saveSection('education')} 
+                  onClick={() => console.log("Change me around line 964 to add the navigate to NExt section maybe experience?")}
+                  //onClick={() => saveSection('education')} 
                   className="w-full"
                   disabled={eligibilityStatus.overall === 'not-eligible'}
                 >
@@ -1039,7 +1054,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                   <CardTitle className="flex items-center gap-2">
                     <Briefcase className="w-5 h-5 text-primary" />
                     Work Experience & Internships
-                    {isSectionSaved('experience') && <Check className="w-4 h-4 text-green-600" />}
+                    {isExperienceComplete && <Check className="w-4 h-4 text-green-600" />}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -1091,7 +1106,8 @@ const profileComplete = isPersonalComplete && isEducationComplete;
               </Card>
 
               <Button 
-                onClick={() => saveSection('experience')} 
+                onClick={() => console.log("Change me on line 962 to add the navigate to NExt section maybe Skills?")}
+                // onClick={() => saveSection('experience')} 
                 className="w-full"
                 disabled={eligibilityStatus.overall === 'not-eligible'}
               >
@@ -1108,7 +1124,9 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                 <CardTitle className="flex items-center gap-2">
                   <Code className="w-5 h-5 text-primary" />
                   Skills & Competencies
-                  {isSectionSaved('skills') && <Check className="w-4 h-4 text-green-600" />}
+                  {isSkillsComplete && <Check className="w-4 h-4 text-green-600" />}
+                  {/* again just the validation for the check sign with the title of the section */}
+                  {/* {isSectionSaved('skills') && <Check className="w-4 h-4 text-green-600" />} */}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -1160,7 +1178,10 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                   </div>
                 </div>
 
-                <Button onClick={() => saveSection('skills')} className="w-full">
+                <Button
+                  onClick={() => console.log("Change me around line 1182 to add the navigate to NExt section maybe Preferences?")} 
+                  //onClick={() => saveSection('skills')} className="w-full"
+                  >
                   <Save className="w-4 h-4 mr-2" />
                   Save Skills & Competencies
                 </Button>
