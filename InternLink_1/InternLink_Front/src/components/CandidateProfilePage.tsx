@@ -189,13 +189,16 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
         institutionLower.includes(inst)
       );
       
+      // normalize degree for comparisons
+      const degreeLower = (formData.highestDegree || '').toLowerCase();
+      
       if (isExcludedInstitution) {
         status.education = 'not-eligible';
         issues.push('Institution not eligible: Graduates from IITs, IIMs, National Law Universities, IISERs, NIDs, and IIITs are not eligible');
       } 
-        else if (excludedDegrees.includes(formData.highestDegree)) {
+        else if (excludedDegrees.includes(degreeLower)) {
           status.education = 'not-eligible';
-          if (['ca', 'cma', 'cs', 'mbbs', 'bds'].includes(formData.highestDegree)) {
+          if (['ca', 'cma', 'cs', 'mbbs', 'bds'].includes(degreeLower)) {
             issues.push('Professional qualification not eligible: CA, CMA, CS, MBBS, BDS holders are not eligible');
           }
           else {
@@ -205,9 +208,9 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
         else {
         // Eligible degrees: class12, iti, diploma, ba, bsc, bcom, bca, bba, bpharma
           const eligibleDegrees = ['class12', 'btech', 'iti', 'diploma', 'ba', 'bsc', 'bcom', 'bca', 'bba', 'bpharma'];
-          if (eligibleDegrees.includes(formData.highestDegree)) {
+          if (eligibleDegrees.includes(degreeLower)) {
             status.education = 'eligible';
-            if (formData.highestDegree === 'class12') {
+            if (degreeLower === 'class12') {
               warnings.push('Education consideration: Having completed only Class 12th. Consider pursuing higher education for better opportunities.');
             }
           }
@@ -216,6 +219,31 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
             issues.push('Education qualification not eligible: Only High School, ITI, Diploma, BA, BSc, BCom, BCA, BBA, or BPharma graduates are eligible');
           }
         }
+    }
+
+    // Academic validation (CGPA / Class12 marks) — sets status.academic so UI reflects it
+    if (formData.cgpa || formData.class12Marks) {
+      let ok = true;
+      if (formData.cgpa) {
+        const cgpaNum = Number(formData.cgpa);
+        if (!isNaN(cgpaNum) && cgpaNum < 50) {
+          status.academic = 'not-eligible';
+          issues.push('Academic requirement not met: Minimum 50% (or equivalent) required in latest qualification.');
+          ok = false;
+        }
+      }
+      if (formData.class12Marks) {
+        const markStr = formData.class12Marks.replace('%','').trim();
+        const m = Number(markStr);
+        if (!isNaN(m) && m < 50) {
+          status.academic = 'not-eligible';
+          issues.push('Academic requirement not met: Minimum 50% in Class 12th.');
+          ok = false;
+        }
+      }
+      if (ok && status.academic !== 'not-eligible') {
+        status.academic = 'eligible';
+      }
     }
 
     // Income validation - Family income must not exceed ₹8,00,000
@@ -788,7 +816,12 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="institution">University/Institution *</Label>
-                    <Input id="institution" placeholder="e.g., IIT Bombay, Delhi University" />
+                    <Input 
+                      id="institution" 
+                      placeholder="e.g., IIT Bombay, Delhi University"
+                      value={formData.institution}
+                      onChange={(e) => updateFormData('institution', e.target.value)}
+                    />
                   </div>
                 </div>
 
