@@ -1393,10 +1393,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
         </Tabs>
         {/* Final Submission */}
         
-        console.log('Personal:', isPersonalComplete);
-        console.log('Education:', isEducationComplete);
-        console.log('Experience:', isExperienceComplete);
-        console.log('ProfileComplete:', profileComplete);
+
 
         {profileComplete && (
           <Card className="mt-8">
