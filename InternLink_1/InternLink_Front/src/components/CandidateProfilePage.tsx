@@ -32,7 +32,8 @@ import {
   CheckCircle,
   XCircle,
   Shield
-} from 'lucide-react';
+} 
+from 'lucide-react';
 import { toast } from 'sonner';
 
 interface CandidateProfilePageProps {
@@ -74,7 +75,9 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
   const [activeTab, setActiveTab] = useState('personal');
   const [skills, setSkills] = useState<string[]>(['JavaScript', 'React', 'Python']);
   const [newSkill, setNewSkill] = useState('');
-  const [savedSections, setSavedSections] = useState<string[]>([]);
+
+  // You don’t need this. It’s cosmetic only.
+  //const [savedSections, setSavedSections] = useState<string[]>([]);
   const [formData, setFormData] = useState<FormData>({
     dateOfBirth: '',
     category: '',
@@ -171,11 +174,13 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
     }
 
     // Education validation - Updated for PM Internship Scheme
-    if (formData.highestDegree && formData.institution) {
+    if (formData.highestDegree) {
       // Excluded prestigious institutions
+      /*
       const excludedInstitutions = [
         'iit', 'iim', 'national law university', 'iiser', 'nid', 'iiit'
       ];
+      */
       
       // Excluded degrees
       const excludedDegrees = [
@@ -185,15 +190,13 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
       
       // Check for excluded institutions
       const institutionLower = formData.institution.toLowerCase();
-      const isExcludedInstitution = excludedInstitutions.some(inst => 
-        institutionLower.includes(inst)
-      );
+      //const isExcludedInstitution = excludedInstitutions.some(inst => institutionLower.includes(inst));
       
-      if (isExcludedInstitution) {
-        status.education = 'not-eligible';
-        issues.push('Institution not eligible: Graduates from IITs, IIMs, National Law Universities, IISERs, NIDs, and IIITs are not eligible');
-      } 
-        else if (excludedDegrees.includes(formData.highestDegree)) {
+      // if (isExcludedInstitution) {
+      //   status.education = 'not-eligible';
+      //   issues.push('Institution not eligible: Graduates from IITs, IIMs, National Law Universities, IISERs, NIDs, and IIITs are not eligible');
+      // } 
+        if (excludedDegrees.includes(formData.highestDegree)) {
           status.education = 'not-eligible';
           if (['ca', 'cma', 'cs', 'mbbs', 'bds'].includes(formData.highestDegree)) {
             issues.push('Professional qualification not eligible: CA, CMA, CS, MBBS, BDS holders are not eligible');
@@ -320,13 +323,14 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
       setSkills([...skills, skill]);
     }
   };
-
-  const saveSection = (section: string) => {
+  //Cosmetic Use of the Save button, doesn't actually do anythign
+  /* 
+    const saveSection = (section: string) => {
     setSavedSections([...savedSections, section]);
     toast.success(`${section} section saved successfully!`);
-  };
-
-  const isSectionSaved = (section: string) => savedSections.includes(section);
+  }; */
+  //same thing with the below line
+  //const isSectionSaved = (section: string) => savedSections.includes(section);
 
   const getEligibilityIcon = (status: string) => {
     switch (status) {
@@ -352,6 +356,14 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
       default:
         return 'text-gray-600 bg-gray-50 border-gray-200';
     }
+  };
+  
+  
+  //Submit Handling Function
+  
+  const handleSubmit = () => {
+  console.log("Submit button pressed");
+  // ... later you can add axios call etc.
   };
 
   return (
@@ -1350,8 +1362,9 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                     Experience {savedSections.includes('experience') && <Check className="w-3 h-3 ml-1" />}
                   </Badge>
                 </div>
-                
+
                 {eligibilityStatus.overall === 'eligible' ? (
+                  /* 
                   <Button 
                     size="lg" 
                     className="bg-green-600 hover:bg-green-700"
@@ -1369,23 +1382,36 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                         await axios.post('http://localhost:5000/api/candidate/data', payload);
                         toast.success('Profile submitted successfully! You are eligible for PM Internship Scheme.');
                         onNavigate('candidate-dashboard');
-                      } catch (err) {
+                      } 
+                      catch (err) {
                         console.error('Error submitting candidate data', err);
                         toast.error('Error submitting data. Please try again later.');
                       }
                     }}
+                  > 
+                    */
+                  //  <Button 
+                  //     size="lg"
+                  //     className="bg-green-600 hover:bg-green-700 text-white"
+                  //     onClick={console.log("Submit Buttom Clicked")}
+                  //   >
+                  <Button 
+                    size="lg"
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    onClick={handleSubmit}
+
                   >
                     <CheckCircle className="w-4 h-4 mr-2" />
                     Submit Profile & Apply for Internships
                   </Button>
-                ) : (
+                ):(
                   <div className="space-y-2">
                     <Button 
                       size="lg" 
                       variant="secondary"
                       disabled
                     >
-                      <XCircle className="w-4 h-4 mr-2" />
+                    <XCircle className="w-4 h-4 mr-2" />
                       Profile Incomplete or Eligibility Issues
                     </Button>
                     <p className="text-sm text-gray-600">
