@@ -55,6 +55,8 @@ interface EligibilityStatus {
 }
 
 interface FormData {
+
+  //need to add more details for Backend Input
   dateOfBirth: string;
   category: string;
   familyIncome: string;
@@ -331,6 +333,7 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
   }; */
   //same thing with the below line
   //const isSectionSaved = (section: string) => savedSections.includes(section);
+  
 
   const getEligibilityIcon = (status: string) => {
     switch (status) {
@@ -365,6 +368,13 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
   console.log("Submit button pressed");
   // ... later you can add axios call etc.
   };
+
+
+const isPersonalComplete = !!formData.name && !!formData.email;
+const isEducationComplete = !!formData.degree && !!formData.institution;
+const isExperienceComplete = !!formData.company && !!formData.role;
+
+const profileComplete = isPersonalComplete && isEducationComplete && isExperienceComplete;
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
