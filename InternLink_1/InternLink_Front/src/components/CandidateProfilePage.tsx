@@ -514,7 +514,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                     <Label htmlFor="fullName">Full Name (as per official documents) *</Label>
                     <Input id="fullName" placeholder="Enter your complete name" />
                   </div>
-
+                  {/* this below in the input tag is the input format to actually store in the form data, we have to ensure each field takes input liek this */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="dateOfBirth">Date of Birth *</Label>
@@ -825,7 +825,15 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="institution">University/Institution *</Label>
-                    <Input id="institution" placeholder="e.g., IIT Bombay, Delhi University" />
+                    {/* <Input id="institution" placeholder="e.g., IIT Bombay, Delhi University" /> */}
+                    {/* The Work in the above line was stupid, nothing is retained so we'll just take input properly */}
+                    <Input 
+                      id="institution" 
+                      placeholder="e.g. IIT Bombay, Galgotias University" 
+                      value={formData.institution}
+                      onChange={(e) => updateFormData('institution', e.target.value)}
+                      className={eligibilityStatus.academic === 'not-eligible' ? 'border-red-500' : ''} //this line just means it would make the border red if academic status is ineligible
+                    />
                   </div>
                 </div>
 
@@ -1385,7 +1393,11 @@ const profileComplete = isPersonalComplete && isEducationComplete;
         </Tabs>
         {/* Final Submission */}
         
-        
+        console.log('Personal:', isPersonalComplete);
+        console.log('Education:', isEducationComplete);
+        console.log('Experience:', isExperienceComplete);
+        console.log('ProfileComplete:', profileComplete);
+
         {profileComplete && (
           <Card className="mt-8">
             <CardContent className="pt-6">
