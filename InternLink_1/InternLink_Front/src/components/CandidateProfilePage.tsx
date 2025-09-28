@@ -369,12 +369,12 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
   // ... later you can add axios call etc.
   };
 
+//variables storing if the below said information is filled or not
+// add the validation for form filling eligibility here
+const isPersonalComplete = !!formData.dateOfBirth && !!formData.category && !!formData.familyIncome;
+const isEducationComplete = !!formData.highestDegree && !!formData.institution && !! formData.cgpa && !! formData.class12Marks;
 
-const isPersonalComplete = !!formData.name && !!formData.email;
-const isEducationComplete = !!formData.degree && !!formData.institution;
-const isExperienceComplete = !!formData.company && !!formData.role;
-
-const profileComplete = isPersonalComplete && isEducationComplete && isExperienceComplete;
+const profileComplete = isPersonalComplete && isEducationComplete;
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
