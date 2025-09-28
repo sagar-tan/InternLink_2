@@ -192,26 +192,30 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
       if (isExcludedInstitution) {
         status.education = 'not-eligible';
         issues.push('Institution not eligible: Graduates from IITs, IIMs, National Law Universities, IISERs, NIDs, and IIITs are not eligible');
-      } else if (excludedDegrees.includes(formData.highestDegree)) {
-        status.education = 'not-eligible';
-        if (['ca', 'cma', 'cs', 'mbbs', 'bds'].includes(formData.highestDegree)) {
-          issues.push('Professional qualification not eligible: CA, CMA, CS, MBBS, BDS holders are not eligible');
-        } else {
-          issues.push('Education level not eligible: Master\'s degree or higher qualification holders are not eligible');
-        }
-      } else {
-        // Eligible degrees: class12, iti, diploma, ba, bsc, bcom, bca, bba, bpharma
-        const eligibleDegrees = ['class12', 'btech', 'iti', 'diploma', 'ba', 'bsc', 'bcom', 'bca', 'bba', 'bpharma'];
-        if (eligibleDegrees.includes(formData.highestDegree)) {
-          status.education = 'eligible';
-          if (formData.highestDegree === 'class12') {
-            warnings.push('Education consideration: Having completed only Class 12th. Consider pursuing higher education for better opportunities.');
-          }
-        } else {
+      } 
+        else if (excludedDegrees.includes(formData.highestDegree)) {
           status.education = 'not-eligible';
-          issues.push('Education qualification not eligible: Only High School, ITI, Diploma, BA, BSc, BCom, BCA, BBA, or BPharma graduates are eligible');
+          if (['ca', 'cma', 'cs', 'mbbs', 'bds'].includes(formData.highestDegree)) {
+            issues.push('Professional qualification not eligible: CA, CMA, CS, MBBS, BDS holders are not eligible');
+          }
+          else {
+            issues.push('Education level not eligible: Master\'s degree or higher qualification holders are not eligible');
+          }
+        } 
+        else {
+        // Eligible degrees: class12, iti, diploma, ba, bsc, bcom, bca, bba, bpharma
+          const eligibleDegrees = ['class12', 'btech', 'iti', 'diploma', 'ba', 'bsc', 'bcom', 'bca', 'bba', 'bpharma'];
+          if (eligibleDegrees.includes(formData.highestDegree)) {
+            status.education = 'eligible';
+            if (formData.highestDegree === 'class12') {
+              warnings.push('Education consideration: Having completed only Class 12th. Consider pursuing higher education for better opportunities.');
+            }
+          }
+          else {
+            status.education = 'not-eligible';
+            issues.push('Education qualification not eligible: Only High School, ITI, Diploma, BA, BSc, BCom, BCA, BBA, or BPharma graduates are eligible');
+          }
         }
-      }
     }
 
     // Income validation - Family income must not exceed ₹8,00,000
