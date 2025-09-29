@@ -203,26 +203,38 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
     // Education validation - Updated for PM Internship Scheme
     if (formData.highestDegree) {
       // Excluded prestigious institutions
-      /*
+
       const excludedInstitutions = [
         'iit', 'iim', 'national law university', 'iiser', 'nid', 'iiit'
       ];
-      */
+
       
       // Excluded degrees
       const excludedDegrees = [
-        'phd', 'mtech', 'msc', 'mca', 'mba', 'ma', 'mcom', 'llm',
-        'ca', 'cma', 'cs', 'mbbs', 'bds'
+        'phd', 'mtech', 'msc', 'mca', 'mba', 'ma', 'mcom', 'llm','ca', 'cma', 'cs', 'mbbs', 'bds'
       ];
       
-      // Check for excluded institutions
+      //manually tying aayushi's 1st commit, institutional validation
+
       const institutionLower = formData.institution.toLowerCase();
-      //const isExcludedInstitution = excludedInstitutions.some(inst => institutionLower.includes(inst));
+      const isExcludedInstitution = excludedInstitutions.some(inst =>institutionLower.includes(inst));
+      if(isExcludedInstitution){
+        status.education= 'not-eligible';
+        issues.push('Institution not eligible: Graduates from IITs, IIMs, National Law Universities, IISERs, NIDs, and IIITs are not eligible')
+      }
+
+
+
       
-      // if (isExcludedInstitution) {
-      //   status.education = 'not-eligible';
-      //   issues.push('Institution not eligible: Graduates from IITs, IIMs, National Law Universities, IISERs, NIDs, and IIITs are not eligible');
-      // } 
+/*    // Check for excluded institutions
+      const institutionLower = formData.institution.toLowerCase();
+      const isExcludedInstitution = excludedInstitutions.some(inst => institutionLower.includes(inst));
+      if (isExcludedInstitution) {
+        status.education = 'not-eligible';
+        issues.push('Institution not eligible: Graduates from IITs, IIMs, National Law Universities, IISERs, NIDs, and IIITs are not eligible');
+      }  */
+
+
         if (excludedDegrees.includes(formData.highestDegree)) {
           status.education = 'not-eligible';
           if (['ca', 'cma', 'cs', 'mbbs', 'bds'].includes(formData.highestDegree)) {
@@ -374,6 +386,7 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
   };
 
   const getEligibilityColor = (status: string) => {
+    console.log("Overall status:", eligibilityStatus.overall);
     switch (status) {
       case 'eligible':
         return 'text-green-600 bg-green-50 border-green-200';
@@ -456,7 +469,8 @@ const profileComplete = isPersonalComplete && isEducationComplete;
             </div>
             
             {/* Eligibility Status Card */}
-            <Card className={`w-80 border-2 ${getEligibilityColor(eligibilityStatus.overall)}`}>
+            <Card className="w-80 border-2 border-green-600">
+            {/* <Card className={`w-80 border-2 ${getEligibilityColor(eligibilityStatus.overall)}`}> */}
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-sm">
                   <Shield className="w-4 h-4" />
