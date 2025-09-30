@@ -32,7 +32,8 @@ import {
   CheckCircle,
   XCircle,
   Shield
-} from 'lucide-react';
+} 
+from 'lucide-react';
 import { toast } from 'sonner';
 
 interface CandidateProfilePageProps {
@@ -54,6 +55,8 @@ interface EligibilityStatus {
 }
 
 interface FormData {
+
+  //need to add more details for Backend Input
   dateOfBirth: string;
   category: string;
   familyIncome: string;
@@ -88,7 +91,9 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
   const [activeTab, setActiveTab] = useState('personal');
   const [skills, setSkills] = useState<string[]>(['JavaScript', 'React', 'Python']);
   const [newSkill, setNewSkill] = useState('');
-  const [savedSections, setSavedSections] = useState<string[]>([]);
+
+  // You don’t need this. It’s cosmetic only.
+  //const [savedSections, setSavedSections] = useState<string[]>([]);
   const [formData, setFormData] = useState<FormData>({
     dateOfBirth: '',
     category: '',
@@ -196,24 +201,32 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
     }
 
     // Education validation - Updated for PM Internship Scheme
-    if (formData.highestDegree && formData.institution) {
+    if (formData.highestDegree) {
       // Excluded prestigious institutions
+
       const excludedInstitutions = [
         'iit', 'iim', 'national law university', 'iiser', 'nid', 'iiit'
       ];
+
       
       // Excluded degrees
       const excludedDegrees = [
-        'phd', 'mtech', 'msc', 'mca', 'mba', 'ma', 'mcom', 'llm',
-        'ca', 'cma', 'cs', 'mbbs', 'bds'
+        'phd', 'mtech', 'msc', 'mca', 'mba', 'ma', 'mcom', 'llm','ca', 'cma', 'cs', 'mbbs', 'bds'
       ];
       
-      // Check for excluded institutions
+      //manually tying aayushi's 1st commit, institutional validation
+
       const institutionLower = formData.institution.toLowerCase();
-      const isExcludedInstitution = excludedInstitutions.some(inst => 
-        institutionLower.includes(inst)
-      );
+      const isExcludedInstitution = excludedInstitutions.some(inst =>institutionLower.includes(inst));
+      if(isExcludedInstitution){
+        status.education= 'not-eligible';
+        issues.push('Institution not eligible: Graduates from IITs, IIMs, National Law Universities, IISERs, NIDs, and IIITs are not eligible')
+      }
+
+
+
       
+
       // normalize degree for comparisons
       const degreeLower = (formData.highestDegree || '').toLowerCase();
       
@@ -374,21 +387,15 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
     }
   };
 
-  const saveSection = (section: string) => {
-    // don't double-save
-    if (savedSections.includes(section)) {
-      toast('Section already saved', {icon: <Check />});
-      return;
-    }
-
-    const ok = validateSectionRequired(section);
-    if (!ok) return;
-
-    setSavedSections(prev => [...prev, section]);
+  //Cosmetic Use of the Save button, doesn't actually do anythign
+  /* 
+    const saveSection = (section: string) => {
+    setSavedSections([...savedSections, section]);
     toast.success(`${section} section saved successfully!`);
-  };
-
-  const isSectionSaved = (section: string) => savedSections.includes(section);
+  }; */
+  //same thing with the below line
+  //const isSectionSaved = (section: string) => savedSections.includes(section);
+  
 
   const getEligibilityIcon = (status: string) => {
     switch (status) {
@@ -404,6 +411,7 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
   };
 
   const getEligibilityColor = (status: string) => {
+    console.log("Overall status:", eligibilityStatus.overall);
     switch (status) {
       case 'eligible':
         return 'text-green-600 bg-green-50 border-green-200';
@@ -414,6 +422,62 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
       default:
         return 'text-gray-600 bg-gray-50 border-gray-200';
     }
+  };
+  
+  
+  //Submit Handling Function
+  
+  const handleSubmit = () => {
+  console.log("Submit button pressed");
+  // ... later you can add axios call etc.
+  };
+
+//variables storing if the below said information is filled or not
+// add the validation for form filling eligibility here
+const isPersonalComplete = !!formData.dateOfBirth && !!formData.category && !!formData.familyIncome;// we should just make a function out of this no?
+const isEducationComplete = !!formData.highestDegree && !!formData.institution && !! formData.cgpa && !! formData.class12Marks;
+// basically making a function and returning True false as per validation would give a little better flexibility 
+const isSkillsComplete = true; //just a jugaad for now, need to add validation later
+const isExperienceComplete = true; //again just a jugaad need to add validation later
+const isPreferncesComplete = true; //again just a jugaad need to add validation later
+const isDocsComplete = true; // do i need to type alladat again
+
+const profileComplete = isPersonalComplete && isEducationComplete;
+
+  // Validate required fields per section (starred fields)
+  const validateSectionRequired = (section: string) => {
+    const missing: string[] = [];
+    const pushIfMissing = (key: keyof FormData, label: string) => {
+      const v = (formData as any)[key];
+      if (v === undefined || v === null || String(v).trim() === '') missing.push(label);
+    };
+
+    if (section === 'personal') {
+      pushIfMissing('fullName', 'Full Name');
+      pushIfMissing('dateOfBirth', 'Date of Birth');
+      pushIfMissing('citizenship', 'Citizenship');
+      pushIfMissing('gender', 'Gender');
+      pushIfMissing('email', 'Email');
+      pushIfMissing('phone', 'Mobile Number');
+      pushIfMissing('currentAddress', 'Current Address');
+      pushIfMissing('city', 'City');
+      pushIfMissing('state', 'State');
+      pushIfMissing('pincode', 'PIN Code');
+    } else if (section === 'education') {
+      pushIfMissing('highestDegree', 'Highest Degree');
+      pushIfMissing('institution', 'Institution');
+      pushIfMissing('cgpa', 'CGPA/Percentage');
+      pushIfMissing('graduationYear', 'Graduation Year');
+    } else if (section === 'preferences') {
+      pushIfMissing('preferredDomain', 'Preferred Domain/Field');
+      pushIfMissing('preferredLocation', 'Preferred Location');
+    }
+
+    if (missing.length > 0) {
+      toast.error(`Please fill required fields: ${missing.join(', ')}`);
+      return false;
+    }
+    return true;
   };
 
   // Validate required fields per section (starred fields)
@@ -466,7 +530,8 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
             </div>
             
             {/* Eligibility Status Card */}
-            <Card className={`w-80 border-2 ${getEligibilityColor(eligibilityStatus.overall)}`}>
+            <Card className="w-80 border-2 border-green-600">
+            {/* <Card className={`w-80 border-2 ${getEligibilityColor(eligibilityStatus.overall)}`}> */}
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-sm">
                   <Shield className="w-4 h-4" />
@@ -577,7 +642,7 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                   <CardTitle className="flex items-center gap-2">
                     <User className="w-5 h-5 text-primary" />
                     Personal Information
-                    {isSectionSaved('personal') && <Check className="w-4 h-4 text-green-600" />}
+                    {isPersonalComplete && <Check className="w-4 h-4 text-green-600" />}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -585,7 +650,7 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                     <Label htmlFor="fullName">Full Name (as per official documents) *</Label>
                     <Input id="fullName" placeholder="Enter your complete name" />
                   </div>
-
+                  {/* this below in the input tag is the input format to actually store in the form data, we have to ensure each field takes input liek this */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="dateOfBirth">Date of Birth *</Label>
@@ -824,9 +889,17 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                   </div>
                 </CardContent>
               </Card>
+              
 
+
+              {/*This button is for Personal Section*/}
+
+
+
+              
               <Button 
-                onClick={() => saveSection('personal')} 
+                onClick={()=> console.log("Go to Education Section by clicking this")}
+                //onClick={() => saveSection('personal')} 
                 className="w-full"
                 disabled={eligibilityStatus.overall === 'not-eligible'}
               >
@@ -843,7 +916,9 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                 <CardTitle className="flex items-center gap-2">
                   <GraduationCap className="w-5 h-5 text-primary" />
                   Educational Background
-                  {isSectionSaved('education') && <Check className="w-4 h-4 text-green-600" />}
+                  {isEducationComplete && <Check className="w-4 h-4 text-green-600" />} 
+                  {/* this validation is for the check icon with the Title of the section */}
+                  {/* {isSectionSaved('education') && <Check className="w-4 h-4 text-green-600" />} */}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -886,11 +961,15 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="institution">University/Institution *</Label>
+
+                    {/* <Input id="institution" placeholder="e.g., IIT Bombay, Delhi University" /> */}
+                    {/* The Work in the above line was stupid, nothing is retained so we'll just take input properly */}
                     <Input 
                       id="institution" 
-                      placeholder="e.g., IIT Bombay, Delhi University"
+                      placeholder="e.g. IIT Bombay, Galgotias University" 
                       value={formData.institution}
                       onChange={(e) => updateFormData('institution', e.target.value)}
+                      className={eligibilityStatus.academic === 'not-eligible' ? 'border-red-500' : ''} //this line just means it would make the border red if academic status is ineligible
                     />
                   </div>
                 </div>
@@ -1026,9 +1105,12 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                     </div>
                   </div>
                 </div>
-
+                
+                {/*This button is for Personal Section*/}
+                
                 <Button 
-                  onClick={() => saveSection('education')} 
+                  onClick={() => console.log("Change me around line 964 to add the navigate to NExt section maybe experience?")}
+                  //onClick={() => saveSection('education')} 
                   className="w-full"
                   disabled={eligibilityStatus.overall === 'not-eligible'}
                 >
@@ -1120,7 +1202,7 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                   <CardTitle className="flex items-center gap-2">
                     <Briefcase className="w-5 h-5 text-primary" />
                     Work Experience & Internships
-                    {isSectionSaved('experience') && <Check className="w-4 h-4 text-green-600" />}
+                    {isExperienceComplete && <Check className="w-4 h-4 text-green-600" />}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -1172,7 +1254,8 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
               </Card>
 
               <Button 
-                onClick={() => saveSection('experience')} 
+                onClick={() => console.log("Change me on line 962 to add the navigate to NExt section maybe Skills?")}
+                // onClick={() => saveSection('experience')} 
                 className="w-full"
                 disabled={eligibilityStatus.overall === 'not-eligible'}
               >
@@ -1189,7 +1272,9 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                 <CardTitle className="flex items-center gap-2">
                   <Code className="w-5 h-5 text-primary" />
                   Skills & Competencies
-                  {isSectionSaved('skills') && <Check className="w-4 h-4 text-green-600" />}
+                  {isSkillsComplete && <Check className="w-4 h-4 text-green-600" />}
+                  {/* again just the validation for the check sign with the title of the section */}
+                  {/* {isSectionSaved('skills') && <Check className="w-4 h-4 text-green-600" />} */}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -1241,7 +1326,10 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                   </div>
                 </div>
 
-                <Button onClick={() => saveSection('skills')} className="w-full">
+                <Button
+                  onClick={() => console.log("Change me around line 1182 to add the navigate to NExt section maybe Preferences?")} 
+                  //onClick={() => saveSection('skills')} className="w-full"
+                  >
                   <Save className="w-4 h-4 mr-2" />
                   Save Skills & Competencies
                 </Button>
@@ -1256,7 +1344,7 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                 <CardTitle className="flex items-center gap-2">
                   <Award className="w-5 h-5 text-primary" />
                   Internship Preferences
-                  {isSectionSaved('preferences') && <Check className="w-4 h-4 text-green-600" />}
+                  {isPreferncesComplete && <Check className="w-4 h-4 text-green-600" />}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -1281,7 +1369,7 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                       <SelectItem value="media">Media & Entertainment</SelectItem>
                       <SelectItem value="automotive">Automotive</SelectItem>
                       <SelectItem value="real estate">Real Estate & Construction</SelectItem>
-                      <SelectItem value="fmcg">FMCG (Fast Moving Consumer Goods</SelectItem>
+                      <SelectItem value="fmcg">FMCG (Fast Moving Consumer Goods)</SelectItem>
                       <SelectItem value="energy">Energy & Utilities</SelectItem>
                       <SelectItem value="transportation">Transportation & Logistics</SelectItem>
                       <SelectItem value="agriculture">Agriculture & Food Processing</SelectItem>
@@ -1351,7 +1439,10 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                   </Select>
                 </div>
 
-                <Button onClick={() => saveSection('preferences')} className="w-full">
+                <Button
+                  onClick={() => console.log("Change me on line 1298 to add the navigate to NExt section maybe docs?")} 
+                  // onClick={() => saveSection('preferences')} className="w-full"
+                  >
                   <Save className="w-4 h-4 mr-2" />
                   Save Internship Preferences
                 </Button>
@@ -1366,7 +1457,8 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                 <CardTitle className="flex items-center gap-2">
                   <Upload className="w-5 h-5 text-primary" />
                   Required Documents
-                  {isSectionSaved('documents') && <Check className="w-4 h-4 text-green-600" />}
+                  {isDocsComplete && <Check className="w-4 h-4 text-green-600" />}
+                  {/* again this is for the check sign only i(sagar) replaced the similar line for all the sections */}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -1426,8 +1518,9 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                     </div>
                   </div>
                 </div>
-
-                <Button onClick={() => saveSection('documents')} className="w-full">
+                <Button onClick={() => console.log("Change me on line 962 to add the navigate to NExt section maybe experience?")}          
+                /* <Button onClick={() => saveSection('documents')}*/
+                 className="w-full">
                   <Save className="w-4 h-4 mr-2" />
                   Save Documents
                 </Button>
@@ -1435,26 +1528,26 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
             </Card>
           </TabsContent>
         </Tabs>
-
         {/* Final Submission */}
-        {savedSections.length >= 3 && (
+        
+
+
+        {profileComplete && (
           <Card className="mt-8">
             <CardContent className="pt-6">
               <div className="text-center space-y-4">
                 <h3 className="text-lg font-semibold">Profile Completion Status</h3>
                 <div className="flex justify-center space-x-4">
-                  <Badge variant={savedSections.includes('personal') ? 'default' : 'secondary'}>
-                    Personal Information {savedSections.includes('personal') && <Check className="w-3 h-3 ml-1" />}
+                  <Badge variant={isPersonalComplete ? 'default' : 'secondary'}>
+                    Personal Information {isPersonalComplete && <Check className="w-3 h-3 ml-1" />}
                   </Badge>
-                  <Badge variant={savedSections.includes('education') ? 'default' : 'secondary'}>
-                    Education {savedSections.includes('education') && <Check className="w-3 h-3 ml-1" />}
-                  </Badge>
-                  <Badge variant={savedSections.includes('experience') ? 'default' : 'secondary'}>
-                    Experience {savedSections.includes('experience') && <Check className="w-3 h-3 ml-1" />}
+                  <Badge variant={isEducationComplete ? 'default' : 'secondary'}>
+                    Education {isEducationComplete && <Check className="w-3 h-3 ml-1" />}
                   </Badge>
                 </div>
-                
+
                 {eligibilityStatus.overall === 'eligible' ? (
+                  /* 
                   <Button 
                     size="lg" 
                     className="bg-green-600 hover:bg-green-700"
@@ -1472,23 +1565,36 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
                         await axios.post('http://localhost:5000/api/candidate/data', payload);
                         toast.success('Profile submitted successfully! You are eligible for PM Internship Scheme.');
                         onNavigate('candidate-dashboard');
-                      } catch (err) {
+                      } 
+                      catch (err) {
                         console.error('Error submitting candidate data', err);
                         toast.error('Error submitting data. Please try again later.');
                       }
                     }}
+                  > 
+                    */
+                  //  <Button 
+                  //     size="lg"
+                  //     className="bg-green-600 hover:bg-green-700 text-white"
+                  //     onClick={console.log("Submit Buttom Clicked")}
+                  //   >
+                  <Button 
+                    size="lg"
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    onClick={handleSubmit}
+
                   >
                     <CheckCircle className="w-4 h-4 mr-2" />
                     Submit Profile & Apply for Internships
                   </Button>
-                ) : (
+                ):(
                   <div className="space-y-2">
                     <Button 
                       size="lg" 
                       variant="secondary"
                       disabled
                     >
-                      <XCircle className="w-4 h-4 mr-2" />
+                    <XCircle className="w-4 h-4 mr-2" />
                       Profile Incomplete or Eligibility Issues
                     </Button>
                     <p className="text-sm text-gray-600">
