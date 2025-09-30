@@ -469,8 +469,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
             </div>
             
             {/* Eligibility Status Card */}
-            <Card className="w-80 border-2 border-green-600">
-            {/* <Card className={`w-80 border-2 ${getEligibilityColor(eligibilityStatus.overall)}`}> */}
+            <Card className={`w-80 border-2 ${getEligibilityColor(eligibilityStatus.overall)}`}>
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-sm">
                   <Shield className="w-4 h-4" />
