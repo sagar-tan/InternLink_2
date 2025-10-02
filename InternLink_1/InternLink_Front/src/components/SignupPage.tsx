@@ -51,20 +51,19 @@ export function SignupPage({ onNavigate, onLogin }: SignupPageProps) {
   setIsLoading(true);
 
   try {
-    const response = await fetch("http://localhost:5000/api/auth/register", {
+    const response = await fetch("http://localhost:8080/api/auth/signup", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         fullName: formData.fullName,
         email: formData.email,
         phone: formData.phone,
         organization: formData.organization,
         password: formData.password,
-        userType  
+        userType
       })
     });
+
 
     const data = await response.json();
 
@@ -73,7 +72,10 @@ export function SignupPage({ onNavigate, onLogin }: SignupPageProps) {
     }
 
     // success: login the user
-    onLogin(userType, data.user);
+     if(response.ok){
+      onNavigate('login');
+      alert("Registration successful! Please log in.");
+     }
   } catch (err: any) {
     console.error(err.message);
     alert(err.message);
