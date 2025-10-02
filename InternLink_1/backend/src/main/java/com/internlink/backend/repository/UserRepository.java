@@ -28,7 +28,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findByPhone(String phone);
     // This method is not used currently, but can be used for login functionality
     // The @Query annotation is used to define a custom query
-    @Query("SELECT u FROM User u WHERE u.email = ?1 AND u.passwordHash = ?2")// a custom query to find a user by email and password hash
+    @Query(value="SELECT u FROM User u WHERE u.email = ?1 AND u.passwordHash = ?2", nativeQuery=true)// a custom query to find a user by email and password hash
     User findByEmailAndPasswordHash(String email, String passwordHash);// to use this we will call userRepository.findByEmailAndPasswordHash(email, passwordHash) in UserService
 
 }
