@@ -38,7 +38,7 @@ public class UserService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
-// the below method is having User like a DataType?
+// the below method is having User , and request like a DataType, well actually its an object, but it can be seen like one
     public User signup(SignupRequest request) {// this is called in AuthController
 
         if (userRepository.findByEmail(request.getEmail()) != null) {
