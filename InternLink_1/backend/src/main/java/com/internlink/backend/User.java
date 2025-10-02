@@ -17,13 +17,28 @@ import lombok.Setter;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long userId;
+    
+    @Column(name = "full_name", nullable = false)
     private String fullName;
+
     @Column(unique = true, nullable = false)
     private String email;
+
+    
+    @Column(name = "password_hash", nullable = false)
     private String passwordHash;
+    
     private String organization;
+    
+    @Column(length = 20)
     private String phone;
+
+    @Column(nullable=false)
+    private String role;
+
+    @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
     
 }
