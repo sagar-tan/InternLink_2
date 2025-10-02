@@ -1,6 +1,7 @@
 package com.internlink.backend.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.internlink.backend.entity.User;
@@ -25,4 +26,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // This is used in UserService to check if a user exists
     User findByEmail(String email);
     User findByPhone(String phone);
+    // This method is not used currently, but can be used for login functionality
+    // The @Query annotation is used to define a custom query
+    @Query("SELECT u FROM User u WHERE u.email = ?1 AND u.passwordHash = ?2")// a custom query to find a user by email and password hash
+    User findByEmailAndPasswordHash(String email, String passwordHash);// to use this we will call userRepository.findByEmailAndPasswordHash(email, passwordHash) in UserService
+
 }
