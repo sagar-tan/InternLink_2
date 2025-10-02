@@ -19,9 +19,6 @@ public class UserService {
     }
 
     public User signup(SignupRequest request) {
-        if (!request.getPassword().equals(request.getConfirmPassword())) {
-            throw new IllegalArgumentException("Passwords do not match");
-        }
 
         if (userRepository.findByEmail(request.getEmail()) != null) {
             throw new IllegalArgumentException("Email already registered");
