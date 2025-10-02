@@ -72,7 +72,10 @@ export function SignupPage({ onNavigate, onLogin }: SignupPageProps) {
     }
 
     // success: login the user
-    onLogin(userType, data.user);
+     if(response.ok){
+      onNavigate('login');
+      alert("Registration successful! Please log in.");
+     }
   } catch (err: any) {
     console.error(err.message);
     alert(err.message);
