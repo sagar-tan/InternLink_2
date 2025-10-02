@@ -1,4 +1,4 @@
-package com.internlink.backend;
+package com.internlink.backend.dto;
 import lombok.Getter;
 import lombok.Setter;
 
