@@ -12,9 +12,9 @@ import com.internlink.backend.dto.SignupRequest;
 import com.internlink.backend.entity.User;
 import com.internlink.backend.service.UserService;
 
-
-@RestController
-@RequestMapping("/api/auth")
+//using @ with spring boot to define a controller class
+@RestController 
+@RequestMapping("/api/auth") // we declare this by @ because we want to define a base URL for all authentication-related endpoints
 //up until not the frontend was hitting wrong endpoint url, so spring boot thinks its a static file request instead of api request
 public class AuthController {
     private final UserService userService;
@@ -24,14 +24,19 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public Map<String, Object> signup(@RequestBody SignupRequest request){//Handling the response from server to frontend
-        User user = userService.signup(request);
+    public Map<String, Object> signup(@RequestBody SignupRequest request){// Method for handling the response from server to frontend
+        User user = userService.signup(request);// calling the signup method from UserService class to handle the signup logic
 
         Map<String, Object> response = new HashMap<>();//DataStructure for Sending Request
         response.put("user", user);//Response 1
         response.put("message", "Signup Successful");//Affirmation of Success
-        return response;
+        return response;// returning the response map to the frontend, the @postMapping annotation ensures that this method handles POST requests to /api/auth/signup
     }
+
+    //@PostMapping("/login")//Login Endpoint 
+
+
+
 
 /*     public User signup(@RequestBody SignupRequest request) {
         return userService.signup(request);

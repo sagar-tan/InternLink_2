@@ -51,7 +51,7 @@ export function SignupPage({ onNavigate, onLogin }: SignupPageProps) {
   setIsLoading(true);
 
   try {
-    const response = await fetch("http://localhost:8080/api/auth/signup", {
+    const response = await fetch("http://localhost:8080/api/auth/signup", {// the server will return 201 Created status code on successful registration
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -66,13 +66,18 @@ export function SignupPage({ onNavigate, onLogin }: SignupPageProps) {
 
 
     const data = await response.json();
+    console.log("status:", response.status); // should be 201
+    console.log("ok:", response.ok);         // true
+    console.log("json body:", data);
+
+
 
     if (!response.ok) {
       throw new Error(data.message || "Failed to register");
     }
 
     // success: login the user
-     if(response.ok){
+     if(response.ok){// response.ok is true for status code 200-299
       onNavigate('login');
       alert("Registration successful! Please log in.");
      }

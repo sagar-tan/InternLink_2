@@ -17,14 +17,14 @@ public class UserService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
-
-    public User signup(SignupRequest request) {
+// the below method is having User like a DataType?
+    public User signup(SignupRequest request) {// this is called in AuthController
 
         if (userRepository.findByEmail(request.getEmail()) != null) {
             throw new IllegalArgumentException("Email already registered");
         }
 
-        User user = new User();
+        User user = new User();// creating a new user object to store the data from request
         user.setFullName(request.getFullName());
         user.setEmail(request.getEmail());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
@@ -34,7 +34,7 @@ public class UserService {
         // Map frontend userType to role
         user.setRole(request.getUserType().toLowerCase());
 
-        return userRepository.save(user);
+        return userRepository.save(user);// saving the user object to the database and returning the saved user
     }
 
 }
