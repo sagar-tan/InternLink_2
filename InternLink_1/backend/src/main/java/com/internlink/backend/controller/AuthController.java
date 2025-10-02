@@ -44,3 +44,15 @@ public class AuthController {
  */
     
 }
+
+
+/*
+ * This whole Backend workflow works as follows:
+ * 1. The frontend sends a POST request to the /api/auth/signup endpoint with the user's signup details in the request body.
+ * 2. The AuthController receives the request and calls the UserService.signup() method to handle the signup logic.
+ * 3. The UserService checks if the email or phone number is already registered.
+ * 4. If the email or phone number is not registered, a new User object is created and saved to the database.
+ * 5. The UserService returns the newly created User object to the AuthController.
+ * 6. The AuthController prepares a response map containing the user information and a success message.
+ * 7. The response map is returned to the frontend.
+ */

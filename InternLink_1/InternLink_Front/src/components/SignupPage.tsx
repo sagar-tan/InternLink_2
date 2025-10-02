@@ -68,7 +68,7 @@ export function SignupPage({ onNavigate, onLogin }: SignupPageProps) {
     const data = await response.json();
     console.log("status:", response.status); // should be 201
     console.log("ok:", response.ok);         // true
-    console.log("json body:", data);
+    console.log("json body:", data); // { message: 'User registered successfully' }
 
 
 

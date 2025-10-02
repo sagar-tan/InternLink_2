@@ -24,4 +24,5 @@ import com.internlink.backend.entity.User;
 public interface UserRepository extends JpaRepository<User, Long> {
     // This is used in UserService to check if a user exists
     User findByEmail(String email);
+    User findByPhone(String phone);
 }
