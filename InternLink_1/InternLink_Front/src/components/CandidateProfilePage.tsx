@@ -57,6 +57,12 @@ interface EligibilityStatus {
 interface FormData {
 
   //need to add more details for Backend Input
+  PwD: boolean;
+  FGG: boolean;
+  PwdType: string;
+  fatherOccupation: string;
+  motherOccupation: string;
+  govtEmployeeDetails: string;
   dateOfBirth: string;
   category: string;
   familyIncome: string;
@@ -69,6 +75,7 @@ interface FormData {
   otherGovtScheme: boolean;
   natsNapsTraining: boolean;
   currentlyEmployed: boolean;
+  pmleveldetails: string;//add handler
   govtEmployee: boolean;
   citizenship: string;
   // Personal required fields
@@ -95,29 +102,46 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
   // You don’t need this. It’s cosmetic only.
   //const [savedSections, setSavedSections] = useState<string[]>([]);
   const [formData, setFormData] = useState<FormData>({
+    //personal Information
     dateOfBirth: '',
-    category: '',
-    familyIncome: '',
-    highestDegree: '',
-    institution: '',
-    cgpa: '',
-    class12Marks: '',
-    pmInternshipPrevious: false,
-    pmSkillingPrevious: false,
-    otherGovtScheme: false,
-    natsNapsTraining: false,
-    currentlyEmployed: false,
-    govtEmployee: false,
     citizenship: '',
     fullName: '',
     gender: '',
     email: '',
     phone: '',
+    currentlyEmployed: false,
     currentAddress: '',
     city: '',
     state: '',
     pincode: '',
+    //Reservation Details
+    category: '',
+    PwD: false,
+    FGG: false,
+    PwdType: '',
+    //Family Background
+    familyIncome: '',
+    govtEmployee: false,
+    fatherOccupation: '',
+    motherOccupation: '',
+    govtEmployeeDetails: '',
+
+
+
+
+    //Education required fields
+    highestDegree: '',
+    institution: '',
+    cgpa: '',
+    class12Marks: '',
     graduationYear: '',
+    //Experince required fields
+    pmInternshipPrevious: false,
+    pmSkillingPrevious: false,
+    otherGovtScheme: false,
+    natsNapsTraining: false,
+    pmleveldetails: '',
+    // Preferences required
     preferredDomain: '',
     preferredLocation: ''
   });
