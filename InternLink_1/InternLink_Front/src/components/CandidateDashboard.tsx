@@ -286,6 +286,7 @@ export function CandidateDashboard({ onNavigate }: CandidateDashboardProps) {
             <span className="text-sm text-gray-600">85% Complete</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
+            {/* progress bar to be dynamic based on user profile completion */}
             <div className="bg-gradient-to-r from-primary to-accent h-2 rounded-full" style={{ width: '85%' }}></div>
           </div>
           
