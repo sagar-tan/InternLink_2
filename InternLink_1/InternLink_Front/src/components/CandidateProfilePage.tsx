@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, SetStateAction } from 'react';
 import axios from 'axios';
 import { initialCandidateData } from './candidateData';
 import { Button } from './ui/button';
@@ -619,7 +619,13 @@ const profileComplete = isPersonalComplete && isEducationComplete;
           )}
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs value={activeTab} onValueChange={(val: 'personal' | 'education' | 'experience' | 'skills' | 'preferences' | 'documents') => {
+          setActiveTab(val);
+          validateSectionRequired(val);
+          window.scrollTo({top : 0, behavior: 'smooth'});
+        }}
+        className="space-y-6"
+        >
           <TabsList className="grid grid-cols-3 lg:grid-cols-6 w-full">
             <TabsTrigger value="personal" className="text-xs">Personal & Demographics</TabsTrigger>
             <TabsTrigger value="education" className="text-xs">Education</TabsTrigger>
