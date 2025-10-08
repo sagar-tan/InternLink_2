@@ -497,7 +497,7 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
       onNavigate('login');
     }
     else{
-      toast.error('Bhagwaan jaane kya beemari  h yrr');
+      toast.error('Bhagwaan jaane kya beemari  h yrr 😭');
     }
 
     
