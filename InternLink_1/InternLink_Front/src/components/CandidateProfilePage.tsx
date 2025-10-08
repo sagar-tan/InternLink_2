@@ -621,7 +621,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
 
         <Tabs value={activeTab} onValueChange={(val: 'personal' | 'education' | 'experience' | 'skills' | 'preferences' | 'documents') => {
           setActiveTab(val);
-          validateSectionRequired(val);
+          validateSectionRequired(val);//this can be used as a Send to backend function too
           window.scrollTo({top : 0, behavior: 'smooth'});
         }}
         className="space-y-6"
@@ -665,6 +665,9 @@ const profileComplete = isPersonalComplete && isEducationComplete;
               Documents
             </TabsTrigger>
           </TabsList>
+          {/*I ain't explaining these changes just a lot of Fomatting details and Validation Changes,
+          now we can add everythign to validate and update in the 
+          validateSectionRequired function*/}
 
           {/* Personal & Demographic Information */}
           <TabsContent value="personal">
