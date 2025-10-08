@@ -926,31 +926,54 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                   </div>
 
                   <div className="flex items-center space-x-2">
-                    <Checkbox id="govtEmployee" />
+                    <Checkbox id="govtEmployee" checked={formData.govtEmployee} onCheckedChange={(checked: boolean) => updateFormData('govtEmployee', checked)} />
                     <Label htmlFor="govtEmployee">
                       Is there a government employee in your immediate family? *
                     </Label>
-                  </div>
+                  </div>{/* Checkbox for government employee in family */}
 
                   <div className="space-y-2">
                     <Label htmlFor="govtEmployeeDetails">If yes, provide details * </Label>
-                    <Input id="govtEmployeeDetails" placeholder="e.g., Father - State Government Teacher" />
-                  </div>
+                    <Input 
+                    id="govtEmployeeDetails" 
+                    placeholder="e.g., Father - State Government Teacher" 
+                    value={formData.govtEmployeeDetails}
+                    onChange={(e) => updateFormData('govtEmployeeDetails', e.target.value)}
+                    />
+                  </div>{/* Government employee details input */}
                 </CardContent>
               </Card>
               
 
 
               {/*This button is for Personal Section*/}
-
-
-
-              
               <Button 
-                onClick={()=> console.log("Go to Education Section by clicking this")}
-                //onClick={() => saveSection('personal')} 
+                onClick={() => {
+                  console.log("Go to Education Section by clicking this");
+                  setActiveTab('education');
+                  window.scrollTo({ top: 0, behavior: 'smooth'});//scrolls to top when the tab changes SMoooooothly 
+                }}
                 className="w-full"
                 disabled={eligibilityStatus.overall === 'not-eligible'}
+
+                /* Anyways here are lyrics for SMooth Operator, jazziest song everrr, You might be tired reading all this!!
+    
+                Face to face, each classic case
+                We shadow box and double cross
+                Yet need the chase
+                A license to love, insurance to hold
+                Melts all your memories and change into gold
+                His eyes are like angels but his heart is cold
+                No need to ask
+                He's a smooth operator
+                Smooth operator
+                Smooth operator
+                Smooth operator
+                Coast to coast, LA to Chicago, western male
+                */
+
+                //onClick={() => saveSection('personal')} 
+
               >
                 <Save className="w-4 h-4 mr-2" />
                 Save Personal & Demographic Information
@@ -1006,7 +1029,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                         <p className="text-xs text-gray-500">PhD holders are not eligible for this scheme</p>
                       )}
                       {eligibilityStatus.education === 'not-eligible' && getEligibilityIcon('not-eligible')}
-                    </div>
+                    </div>{/* Highest Degree selection */}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="institution">University/Institution *</Label>
@@ -1019,17 +1042,20 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                       onChange={(e) => updateFormData('institution', e.target.value)}
                       className={eligibilityStatus.academic === 'not-eligible' ? 'border-red-500' : ''} //this line just means it would make the border red if academic status is ineligible
                     />
-                  </div>
+                  </div>{/* Institution input */}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="fieldOfStudy">Field of Study *</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select field of study" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="engineering">Engineering</SelectItem>
+                  <Select
+                      value={formData.studyField}
+                      onValueChange={(value: string) => updateFormData('studyField', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select field of study" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="engineering">Engineering</SelectItem>
                       <SelectItem value="computer-science">Computer Science</SelectItem>
                       <SelectItem value="commerce">Commerce</SelectItem>
                       <SelectItem value="management">Management</SelectItem>
@@ -1046,7 +1072,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                       <SelectItem value="design">Design</SelectItem>
                       <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
-                  </Select>
+                  </Select>{/* Field of Study selection */}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1093,8 +1119,16 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="graduationYear">Year of Completion/Expected Graduation *</Label>
-                    <Input id="graduationYear" type="number" placeholder="2025" min="2020" max="2030" />
-                  </div>
+                    <Input 
+                    id="graduationYear" 
+                    type="number" 
+                    placeholder="2025" 
+                    min="2020" 
+                    max="2030" 
+                    value={formData.graduationYear}
+                    onChange={(e) => updateFormData('graduationYear', e.target.value)}
+                    />
+                  </div>{/* Graduation Year input */}
                 </div>
 
                 <Separator />
@@ -1322,6 +1356,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                   Skills & Competencies
                   {isSkillsComplete && <Check className="w-4 h-4 text-green-600" />}
                   {/* again just the validation for the check sign with the title of the section */}
+
                   {/* {isSectionSaved('skills') && <Check className="w-4 h-4 text-green-600" />} */}
                 </CardTitle>
               </CardHeader>
