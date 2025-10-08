@@ -124,7 +124,6 @@ interface FormData {
 
 export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) {
   const [activeTab, setActiveTab] = useState('personal');
-  const [skills, setSkills] = useState<string[]>(['JavaScript', 'React', 'Python']);
   const [newSkill, setNewSkill] = useState('');
 
   // You don’t need this. It’s cosmetic only.
@@ -403,21 +402,31 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
   }, [formData]);
 
   const addSkill = () => {
-    if (newSkill.trim() && !skills.includes(newSkill.trim())) {
-      setSkills([...skills, newSkill.trim()]);
+    if (newSkill.trim() && !formData.skills.includes(newSkill.trim())) {
+      setFormData({
+        ...formData,
+        skills: [...formData.skills, newSkill.trim()]
+
+      });
       setNewSkill('');
     }
   };
 
   const removeSkill = (skillToRemove: string) => {
-    setSkills(skills.filter(skill => skill !== skillToRemove));
+    setFormData({
+      ...formData,
+      skills: formData.skills.filter(skill=> skill !== skillToRemove),
+    });
   };
 
   const toggleCommonSkill = (skill: string) => {
-    if (skills.includes(skill)) {
+    if (formData.skills.includes(skill)) {
       removeSkill(skill);
     } else {
-      setSkills([...skills, skill]);
+      setFormData({
+        ...formData,
+        skills: [...formData.skills, skill],
+      });
     }
   };
   //Cosmetic Use of the Save button, doesn't actually do anythign
@@ -512,8 +521,6 @@ const profileComplete = isPersonalComplete && isEducationComplete;
     }
     return true;
   };
-
-  //Helper Functions for Skills
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -1526,19 +1533,23 @@ https://open.spotify.com/playlist/37i9dQZF1E8KWGOkQ6Xhuz?si=fb8272c3fb314f85
                     {commonSkills.map((skill, index) => (
                       <Badge 
                         key={index} 
-                        variant={skills.includes(skill) ? "default" : "outline"}
+                        variant={formData.skills.includes(skill) ? "default" : "outline"}
                         className="cursor-pointer"
                         onClick={() => toggleCommonSkill(skill)}
                       >
                         {skill}
-                        {skills.includes(skill) && <Check className="w-3 h-3 ml-1" />}
+                        {formData.skills.includes(skill) && <Check className="w-3 h-3 ml-1" />}
                       </Badge>
                     ))}
                   </div>
                 </div>
 
                 <Button
-                  onClick={() => console.log("Change me around line 1279 to add the navigate to Next section maybe Preferences?")} 
+                  onClick={() =>{
+                    window.scrollTo({top:0, behavior: 'smooth'});
+                    setActiveTab('preferences');
+                    console.log("This is a check for the Details of Skills Saved or not in array", formData.skills)}
+                    } 
                   //onClick={() => saveSection('skills')} className="w-full"
                   >
                   <Save className="w-4 h-4 mr-2" />
