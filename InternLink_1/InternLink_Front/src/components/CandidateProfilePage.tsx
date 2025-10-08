@@ -55,43 +55,71 @@ interface EligibilityStatus {
 }
 
 interface FormData {
-
-  //need to add more details for Backend Input
-  PwD: boolean;
-  FGG: boolean;
-  PwdType: string;
-  fatherOccupation: string;
-  motherOccupation: string;
-  govtEmployeeDetails: string;
+  // --- Personal Information ---
+  fullName: string;
+  gender: string;
   dateOfBirth: string;
-  category: string;
-  familyIncome: string;
-  highestDegree: string;
-  institution: string;
-  cgpa: string;
-  class12Marks: string;
-  pmInternshipPrevious: boolean;
-  pmSkillingPrevious: boolean;
-  otherGovtScheme: boolean;
-  natsNapsTraining: boolean;
-  currentlyEmployed: boolean;
-  pmleveldetails: string;//add handler
-  govtEmployee: boolean;
   citizenship: string;
-  // Personal required fields
-  fullName?: string;
-  gender?: string;
-  email?: string;
-  phone?: string;
+  email: string;
+  phone: string;
+  currentlyEmployed?: boolean;
   currentAddress?: string;
   city?: string;
   state?: string;
   pincode?: string;
-  // Education additional required
+
+  // --- Reservation Details ---
+  category: string;
+  PwD?: boolean;
+  PwdType?: string;
+  FGG?: boolean;
+  govtEmployee?: boolean;
+  govtEmployeeDetails?: string;
+
+  // --- Family Background ---
+  familyIncome?: string;
+  fatherOccupation?: string;
+  motherOccupation?: string;
+
+  // --- Educational Background ---
+  highestDegree: string;
+  institution: string;
+  studyField: string;
+  specialization?: string;
+  cgpa?: string;
+  currYear?: string;
   graduationYear?: string;
-  // Preferences required
-  preferredDomain?: string;
-  preferredLocation?: string;
+
+  // --- Previous Education ---
+  class12Board?: string;
+  class12Year?: string;
+  class12Marks?: string;
+  class12Stream?: string;
+
+  // --- Past Participation ---
+  pmInternshipPrevious?: boolean;
+  pmSkillingPrevious?: boolean;
+  otherGovtScheme?: boolean;
+  natsNapsTraining?: boolean;
+  pmleveldetails?: string;
+
+  // --- Work Experience ---
+  companyName?: string;
+  position?: string;
+  startDate?: string;
+  endDate?: string;
+  responsibilities?: string;
+  keyAchievements?: string;
+  workHereNow?: boolean;
+
+  // --- Skills ---
+  skills: string[];
+
+  // --- Preferences ---
+  preferredDomain: string;
+  preferredLocation: string;
+  preferredDuration?: string;
+  monthlyStipend?: string;
 }
 
 export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) {
@@ -126,24 +154,42 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
     motherOccupation: '',
     govtEmployeeDetails: '',
 
-
-
-
-    //Education required fields
+    //Educational BG fields
     highestDegree: '',
     institution: '',
+    studyField: '',
+    specialization: '',
     cgpa: '',
-    class12Marks: '',
+    currYear: '',
     graduationYear: '',
-    //Experince required fields
+
+    //Previous Education fields
+    class12Board: '',
+    class12Year: '',
+    class12Marks: '',
+    class12Stream: '',
+    //Past Participation fields
     pmInternshipPrevious: false,
     pmSkillingPrevious: false,
     otherGovtScheme: false,
     natsNapsTraining: false,
     pmleveldetails: '',
+    //Work Experience fields
+    companyName: '',
+    position: '',
+    startDate: '',
+    endDate: '',
+    responsibilities: '',
+    keyAchievements: '',
+    workHereNow: false,
+
+    //Skills
+    skills: [],
     // Preferences required
     preferredDomain: '',
-    preferredLocation: ''
+    preferredLocation: '',
+    preferredDuration: '',
+    monthlyStipend: ''
   });
   const [eligibilityStatus, setEligibilityStatus] = useState<EligibilityStatus>({
     overall: 'pending',
@@ -957,7 +1003,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="year">Current Year/Status</Label>
-                    <Select>
+                    <Select onValueChange={(value: string) => updateFormData('currYear', value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select current status" />
                       </SelectTrigger>
@@ -1203,7 +1249,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
               </Card>
 
               <Button 
-                onClick={() => console.log("Change me on line 962 to add the navigate to NExt section maybe Skills?")}
+                onClick={() => console.log("Change me on line 1206 to add the navigate to Next section maybe Skills?")}
                 // onClick={() => saveSection('experience')} 
                 className="w-full"
                 disabled={eligibilityStatus.overall === 'not-eligible'}
@@ -1276,7 +1322,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                 </div>
 
                 <Button
-                  onClick={() => console.log("Change me around line 1182 to add the navigate to NExt section maybe Preferences?")} 
+                  onClick={() => console.log("Change me around line 1279 to add the navigate to Next section maybe Preferences?")} 
                   //onClick={() => saveSection('skills')} className="w-full"
                   >
                   <Save className="w-4 h-4 mr-2" />
@@ -1389,7 +1435,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                 </div>
 
                 <Button
-                  onClick={() => console.log("Change me on line 1298 to add the navigate to NExt section maybe docs?")} 
+                  onClick={() => console.log("Change me on line 1392 to add the navigate to Next section maybe docs?")} 
                   // onClick={() => saveSection('preferences')} className="w-full"
                   >
                   <Save className="w-4 h-4 mr-2" />
@@ -1467,7 +1513,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                     </div>
                   </div>
                 </div>
-                <Button onClick={() => console.log("Change me on line 962 to add the navigate to NExt section maybe experience?")}          
+                <Button onClick={() => console.log("Change me on line 1470 to add the navigate to NExt section maybe experience?")}          
                 /* <Button onClick={() => saveSection('documents')}*/
                  className="w-full">
                   <Save className="w-4 h-4 mr-2" />
