@@ -1098,7 +1098,13 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                     </Select>
                   </div>
                 </div>
+                {/* 
+Miss/Mr Reviewer,
 
+Check this out tho
+https://open.spotify.com/playlist/37i9dQZF1E8KWGOkQ6Xhuz?si=fb8272c3fb314f85 
+
+*/}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="cgpa">CGPA/Percentage *</Label>
@@ -1129,7 +1135,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                     onChange={(e) => updateFormData('graduationYear', e.target.value)}
                     />
                   </div>{/* Graduation Year input */}
-                </div>
+                </div>{/* CGPA and Graduation Year inputs */}
 
                 <Separator />
 
@@ -1138,7 +1144,10 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="class12Board">Class 12th Board *</Label>
-                      <Select>
+                      <Select
+                        value={formData.class12Board}
+                        onValueChange={(value: string) => updateFormData('class12Board', value)}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select board" />
                         </SelectTrigger>
@@ -1151,7 +1160,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                           <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
+                    </div>{/* Class 12th Board selection */}
                     <div className="space-y-2">
                       <Label htmlFor="class12Marks">Class 12th Marks/Percentage *</Label>
                       <Input 
@@ -1161,13 +1170,16 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                         onChange={(e) => updateFormData('class12Marks', e.target.value)}
                         className={eligibilityStatus.academic === 'not-eligible' ? 'border-red-500' : ''}
                       />
-                    </div>
+                    </div>{/* Class 12th Marks input */}
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <div className="space-y-2">
                       <Label htmlFor="class12Stream">Class 12th Stream</Label>
-                      <Select>
+                      <Select
+                        value={formData.class12Stream}
+                        onValueChange={(value: string) => updateFormData('class12Stream', value)}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select stream" />
                         </SelectTrigger>
@@ -1180,19 +1192,48 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                           <SelectItem value="vocational">Vocational</SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
+                    </div>{/* Class 12th Stream selection */}
                     <div className="space-y-2">
                       <Label htmlFor="class12Year">Class 12th Year of Completion</Label>
-                      <Input id="class12Year" type="number" placeholder="2022" min="2015" max="2025" />
-                    </div>
+                      <Input 
+                      id="class12Year" 
+                      type="number" 
+                      placeholder="2022" 
+                      min="2015" 
+                      max="2025" 
+                      value={formData.class12Year}
+                      onChange={(e) => updateFormData('class12Year', e.target.value)}
+                      />
+                    </div>{/* Class 12th Year input */}
                   </div>
                 </div>
                 
                 {/*This button is for Personal Section*/}
                 
                 <Button 
-                  onClick={() => console.log("Change me around line 964 to add the navigate to NExt section maybe experience?")}
+                  onClick={() => {console.log("Change me around line 964 to add the navigate to NExt section maybe experience?")
+                    setActiveTab('experience');
+                    window.scrollTo({ top: 0, behavior: 'smooth'});//scrolls to top when the tab changes SMoooooothly againnnnn
+                  }}
+
+                  /* 
+                  Anyways Here are rest of the lyrics for Smooth Operator, jazziest song everrr
+                  Coast to coast, LA to Chicago, western male
+                  Across the north and south, to Key Largo, love for sale
+                  Smooth operator
+                  Smooth operator
+                  Smooth operator
+                  Smooth operator
+                  Smooth operator
+                  Smooth operator
+                  Smooth operator
+                  Smooth operator
+                  Smooth operator
+                  Smooth operator
+                  Smooth operator
+                  */
                   //onClick={() => saveSection('education')} 
+                  
                   className="w-full"
                   disabled={eligibilityStatus.overall === 'not-eligible'}
                 >
