@@ -1113,13 +1113,18 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                       <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>{/* Field of Study selection */}
-                </div>
+                </div>{/* Field of Study selection */}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="specialization">Specialization/Major</Label>
-                    <Input id="specialization" placeholder="e.g., Computer Science & Engineering" />
-                  </div>
+                    <Input 
+                    id="specialization" 
+                    placeholder="e.g., Computer Science & Engineering" 
+                    value={formData.specialization}
+                    onChange={(e) => updateFormData('specialization', e.target.value)}
+                  />
+                  </div>{/*Specialization Input*/}
                   <div className="space-y-2">
                     <Label htmlFor="year">Current Year/Status</Label>
                     <Select onValueChange={(value: string) => updateFormData('currYear', value)}>
@@ -1136,7 +1141,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                         <SelectItem value="gap-year">Gap Year</SelectItem>
                       </SelectContent>
                     </Select>
-                  </div>
+                  </div>{/* Current Year Status*/}
                 </div>
                 {/* 
 Miss/Mr Reviewer,
@@ -1248,7 +1253,7 @@ https://open.spotify.com/playlist/37i9dQZF1E8KWGOkQ6Xhuz?si=fb8272c3fb314f85
                   </div>
                 </div>
                 
-                {/*This button is for Personal Section*/}
+                {/*This button is for Education Section*/}
                 
                 <Button 
                   onClick={() => {console.log("Change me around line 964 to add the navigate to NExt section maybe experience?")
