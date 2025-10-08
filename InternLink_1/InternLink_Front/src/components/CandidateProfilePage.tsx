@@ -644,7 +644,12 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
                     <Label htmlFor="fullName">Full Name (as per official documents) *</Label>
-                    <Input id="fullName" placeholder="Enter your complete name" />
+                    <Input id="fullName"
+                           placeholder="Enter your complete name"
+                           value={formData.fullName}
+                           onChange={(e) => updateFormData('fullName', e.target.value)}
+                           required
+                           />{/* //Updating this field also in the form data */}
                   </div>
                   {/* this below in the input tag is the input format to actually store in the form data, we have to ensure each field takes input liek this */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -690,18 +695,21 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="gender">Gender *</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select gender" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="male">Male</SelectItem>
+                      <Select
+                          value={formData.gender}
+                          onValueChange={(value: string) => updateFormData('gender', value)}
+                        >{/* Adding Handled For gender Change and add */}
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select gender" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="male">Male</SelectItem>
                           <SelectItem value="female">Female</SelectItem>
                           <SelectItem value="transgender">Transgender</SelectItem>
                           <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
+                    </div> 
                     <div className="space-y-2">
                       <Label htmlFor="currentlyEmployed">Employment Status *</Label>
                       <Select 
@@ -726,11 +734,20 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="email">Email Address *</Label>
-                      <Input id="email" type="email" placeholder="your.email@example.com" />
+                      <Input id="email"
+                             type="email" 
+                             placeholder="your.email@example.com"
+                             value={formData.email}
+                             onChange={(e) => updateFormData('email', e.target.value)}
+                             />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="phone">Mobile Number *</Label>
-                      <Input id="phone" placeholder="+91 98765 43210" />
+                      <Input id="phone"
+                             placeholder="+91 98765 43210"
+                             value={formData.phone}
+                             onChange={(e) => updateFormData('phone', e.target.value)}
+                             />
                     </div>
                   </div>
 
