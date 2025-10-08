@@ -856,7 +856,8 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                           />
                       <Label htmlFor="firstGeneration">First Generation Graduate</Label>
                     </div>
-                  </div>{/* PwD and First Generation Graduate checkboxes */}
+                  </div>{/* PwD and First Generation Graduate checkboxes */} 
+
 
                   <div className="space-y-2">
                     <Label htmlFor="disabilityType">If PwD, specify type of disability</Label>
