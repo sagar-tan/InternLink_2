@@ -627,12 +627,43 @@ const profileComplete = isPersonalComplete && isEducationComplete;
         className="space-y-6"
         >
           <TabsList className="grid grid-cols-3 lg:grid-cols-6 w-full">
-            <TabsTrigger value="personal" className="text-xs">Personal & Demographics</TabsTrigger>
-            <TabsTrigger value="education" className="text-xs">Education</TabsTrigger>
-            <TabsTrigger value="experience" className="text-xs">Experience</TabsTrigger>
-            <TabsTrigger value="skills" className="text-xs">Skills</TabsTrigger>
-            <TabsTrigger value="preferences" className="text-xs">Preferences</TabsTrigger>
-            <TabsTrigger value="documents" className="text-xs">Documents</TabsTrigger>
+            <TabsTrigger 
+            value="personal" 
+            className="text-xs px-2 py-1 rounded-md data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:font-medium transition-colors duration-200
+             bg-gray-100 text-gray-700 hover:bg-gray-200"
+             >
+              Personal Details
+              </TabsTrigger>
+            <TabsTrigger value="education" className="text-xs px-2 py-1 rounded-md data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:font-medium transition-colors duration-200
+             bg-gray-100 text-gray-700 hover:bg-gray-200"
+             >
+              Education
+            </TabsTrigger>
+            <TabsTrigger 
+            value="experience" 
+            className="text-xs px-2 py-1 rounded-md data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:font-medium transition-colors duration-200
+             bg-gray-100 text-gray-700 hover:bg-gray-200"
+             >
+              Experience
+            </TabsTrigger>
+            <TabsTrigger value="skills" 
+            className="text-xs px-2 py-1 rounded-md data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:font-medium transition-colors duration-200
+             bg-gray-100 text-gray-700 hover:bg-gray-200"
+             >
+              Skills
+            </TabsTrigger>
+            <TabsTrigger value="preferences" 
+            className="text-xs px-2 py-1 rounded-md data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:font-medium transition-colors duration-200
+             bg-gray-100 text-gray-700 hover:bg-gray-200"
+             >
+              Preferences
+            </TabsTrigger>
+            <TabsTrigger value="documents" 
+            className="text-xs px-2 py-1 rounded-md data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:font-medium transition-colors duration-200
+             bg-gray-100 text-gray-700 hover:bg-gray-200"
+             >
+              Documents
+            </TabsTrigger>
           </TabsList>
 
           {/* Personal & Demographic Information */}
