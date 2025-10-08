@@ -1378,24 +1378,61 @@ https://open.spotify.com/playlist/37i9dQZF1E8KWGOkQ6Xhuz?si=fb8272c3fb314f85
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="companyName">Company/Organization</Label>
-                      <Input id="companyName" placeholder="TechFlow India Pvt. Ltd." />
-                    </div>
+                      <Input 
+                      id="companyName" 
+                      placeholder="TechFlow India Pvt. Ltd." 
+                      value={formData.companyName}
+                      onChange={(e)=> updateFormData('companyName', e.target.value)}
+                      />
+                    </div> {/* Company name */}
+
                     <div className="space-y-2">
                       <Label htmlFor="position">Position/Role</Label>
-                      <Input id="position" placeholder="Software Development Intern" />
-                    </div>
+                      <Input 
+                      id="position" 
+                      placeholder="Software Development Intern" 
+                      value={formData.position}
+                      onChange={(e)=> updateFormData('position', e.target.value)}
+                      />
+                    </div>{/* Company Position */}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Start Date */}
                     <div className="space-y-2">
                       <Label htmlFor="startDate">Start Date</Label>
-                      <Input id="startDate" type="month" />
+                      <Input 
+                        id="startDate" 
+                        type="month" 
+                        value={formData.startDate}
+                        onChange={(e)=> updateFormData('startDate', e.target.value)}
+                      />
                     </div>
+
+                    {/* End Date + Checkbox in same column */}
                     <div className="space-y-2">
                       <Label htmlFor="endDate">End Date</Label>
-                      <Input id="endDate" type="month" />
+                      <Input 
+                        id="endDate" 
+                        type="month" 
+                        value={formData.workHereNow ? new Date().toISOString().slice(0,7) : formData.endDate}
+                        onChange={(e)=> updateFormData('endDate', e.target.value)}
+                        disabled={formData.workHereNow} 
+                        className={formData.workHereNow ? 'bg-gray-100 cursor-not-allowed' : ''} //disables end date if currently work is enabled
+                      />
+
+                      {/* Checkbox below End Date */}
+                      <div className="flex items-center space-x-2 mt-2">
+                        <Checkbox 
+                          id="currentWork"
+                          checked={formData.workHereNow}
+                          onCheckedChange={(checked: boolean | undefined) => updateFormData('workHereNow', !!checked)} 
+                        />
+                        <Label htmlFor="currentWork">I currently work here</Label>
+                      </div>
                     </div>
-                  </div>
+                  </div>{/* Joining Duration Details */}
+
 
                   <div className="space-y-2">
                     <Label htmlFor="jobDescription">Description & Responsibilities</Label>
@@ -1415,10 +1452,7 @@ https://open.spotify.com/playlist/37i9dQZF1E8KWGOkQ6Xhuz?si=fb8272c3fb314f85
                     />
                   </div>
 
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="currentWork" />
-                    <Label htmlFor="currentWork">I currently work here</Label>
-                  </div>
+                  
                 </CardContent>
               </Card>
 
