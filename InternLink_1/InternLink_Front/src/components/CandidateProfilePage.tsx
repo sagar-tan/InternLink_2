@@ -1572,7 +1572,10 @@ https://open.spotify.com/playlist/37i9dQZF1E8KWGOkQ6Xhuz?si=fb8272c3fb314f85
               <CardContent className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="preferredDomain">Preferred Domain/Field *</Label>
-                  <Select>
+                  <Select
+                    value={formData.preferredDomain}
+                    onValueChange={(value: string) => updateFormData('preferredDomain', value)}
+                    >
                     <SelectTrigger>
                       <SelectValue placeholder="Select preferred domain" />
                     </SelectTrigger>
