@@ -35,6 +35,7 @@ import {
 } 
 from 'lucide-react';
 import { toast } from 'sonner';
+import apiClient from '../api/apiClient'; // Import the configured Axios instance this is manually done btw
 
 interface CandidateProfilePageProps {
   onNavigate: (page: string) => void;
@@ -484,16 +485,7 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
       onNavigate('login');
       return;
     }
-    const response = await axios.post(
-      'http://localhost:8080/api/candidate/data',
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const response = await apiClient.post('/candidate/data', payload);// everything else is defined in ApiClient.ts
     toast.success('Profile Data Bahutehi pyaar ke saath DB me jaa chuka h, kripya Schema ko dekhke Khushi ka Anubhav kre');
     console.log('Response:', response.data);
     onNavigate('candidate-dashboard');
