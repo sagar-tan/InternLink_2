@@ -650,7 +650,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                            onChange={(e) => updateFormData('fullName', e.target.value)}
                            required
                            />{/* //Updating this field also in the form data */}
-                  </div>
+                  </div>{/* Full Name and Date of Birth */}
                   {/* this below in the input tag is the input format to actually store in the form data, we have to ensure each field takes input liek this */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -690,7 +690,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                         {formData.citizenship && getEligibilityIcon(eligibilityStatus.citizenship)}
                       </div>
                     </div>
-                  </div>
+                  </div>{/* Citizenship selection */}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -709,7 +709,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                           <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
                       </Select>
-                    </div> 
+                    </div> {/* Gender selection */}
                     <div className="space-y-2">
                       <Label htmlFor="currentlyEmployed">Employment Status *</Label>
                       <Select 
@@ -728,7 +728,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                         <p className="text-xs text-gray-500">Must not be currently employed</p>
                         {getEligibilityIcon(eligibilityStatus.employment)}
                       </div>
-                    </div>
+                    </div> {/* Employment status */}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -749,21 +749,33 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                              onChange={(e) => updateFormData('phone', e.target.value)}
                              />
                     </div>
-                  </div>
+                  </div> {/* Input fields for email and phone number */}
 
                   <div className="space-y-2">
                     <Label htmlFor="currentAddress">Current Address *</Label>
-                    <Textarea id="currentAddress" placeholder="Enter your complete current address" />
-                  </div>
+                    <Textarea id="currentAddress" 
+                              placeholder="Enter your complete current address"
+                              value={formData.currentAddress}
+                              onChange={(e) => updateFormData('currentAddress', e.target.value)}
+                              /> 
+                  </div>{/* Textarea for multi-line address input */}
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="city">City *</Label>
-                      <Input id="city" placeholder="Mumbai" />
-                    </div>
+                      <Input 
+                          id="city" 
+                          placeholder="Mumbai"
+                          value={formData.city}
+                          onChange={(e) => updateFormData('city', e.target.value)} 
+                          />
+                    </div>{/* City input */}
                     <div className="space-y-2">
                       <Label htmlFor="state">State *</Label>
-                      <Select>
+                      <Select
+                          value={formData.state}
+                          onValueChange={(value: string) => updateFormData('state', value)}
+                        >
                         <SelectTrigger>
                           <SelectValue placeholder="Select state" />
                         </SelectTrigger>
@@ -781,12 +793,12 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                           <SelectItem value="west-bengal">West Bengal</SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
+                    </div>{/* State selection */}
                     <div className="space-y-2">
                       <Label htmlFor="pincode">PIN Code *</Label>
-                      <Input id="pincode" placeholder="400001" />
-                    </div>
-                  </div>
+                      <Input id="pincode" placeholder="400001" value={formData.pincode} onChange={(e) => updateFormData('pincode', e.target.value)} />
+                    </div>{/* PIN Code input */}
+                  </div>{/* Grid for City, State, PIN Code */}
                 </CardContent>
               </Card>
 
@@ -825,18 +837,26 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                     {formData.category === 'ews' && (
                       <p className="text-xs text-blue-600">EWS category requires family income verification below ₹8 Lakh per annum</p>
                     )}
-                  </div>
+                  </div>{/* Category selection */}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="pwd" />
+                      <Checkbox 
+                          id="pwd"
+                          checked={formData.PwD}
+                          onCheckedChange={(checked: boolean) => updateFormData('PwD', checked)}
+                          />
                       <Label htmlFor="pwd">Person with Disability (PwD)</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="firstGeneration" />
+                      <Checkbox 
+                          id="firstGeneration"
+                          checked={formData.FGG}
+                          onCheckedChange={(checked: boolean) => updateFormData('FGG', checked)}
+                          />
                       <Label htmlFor="firstGeneration">First Generation Graduate</Label>
                     </div>
-                  </div>
+                  </div>{/* PwD and First Generation Graduate checkboxes */}
 
                   <div className="space-y-2">
                     <Label htmlFor="disabilityType">If PwD, specify type of disability</Label>
