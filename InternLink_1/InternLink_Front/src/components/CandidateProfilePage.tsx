@@ -484,8 +484,30 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
       onNavigate('login');
       return;
     }
-    
-  } catch (err: any) {
+    const response = await axios.post(
+      'http://localhost:8080/api/candidate/data',
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    toast.success('Profile Data Bahutehi pyaar ke saath DB me jaa chuka h, kripya Schema ko dekhke Khushi ka Anubhav kre');
+    console.log('Response:', response.data);
+    onNavigate('candidate-dashboard');
+  } 
+  catch (err: any) {
+    console.error('Error Submitting Candidate data:', err);
+    if(err.response?.status === 401){
+      toast.error('Session Expired. Please log in again.');
+      onNavigate('login');
+    }
+    else{
+      toast.error('Bhagwaan jaane kya beemari  h yrr');
+    }
+
     
   }
 
