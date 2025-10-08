@@ -1613,7 +1613,10 @@ https://open.spotify.com/playlist/37i9dQZF1E8KWGOkQ6Xhuz?si=fb8272c3fb314f85
 
                 <div className="space-y-2">
                   <Label htmlFor="preferredLocation">Preferred Location *</Label>
-                  <Select>
+                  <Select
+                    value={formData.preferredLocation}
+                    onValueChange={(value: string) => updateFormData('preferredLocation', value)}
+                    >
                     <SelectTrigger>
                       <SelectValue placeholder="Select preferred location" />
                     </SelectTrigger>
@@ -1634,7 +1637,10 @@ https://open.spotify.com/playlist/37i9dQZF1E8KWGOkQ6Xhuz?si=fb8272c3fb314f85
 
                 <div className="space-y-2">
                   <Label htmlFor="internshipDuration">Preferred Duration</Label>
-                  <Select>
+                  <Select
+                  value={formData.preferredDuration}
+                  onValueChange={(value: string) => updateFormData('preferredDuration', value)}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select duration" />
                     </SelectTrigger>
@@ -1649,7 +1655,10 @@ https://open.spotify.com/playlist/37i9dQZF1E8KWGOkQ6Xhuz?si=fb8272c3fb314f85
 
                 <div className="space-y-2">
                   <Label htmlFor="expectedStipend">Expected Monthly Stipend</Label>
-                  <Select>
+                  <Select
+                  value={formData.monthlyStipend}
+                  onValueChange={(value: string) => updateFormData('monthlyStipend', value)}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select stipend range" />
                     </SelectTrigger>
@@ -1673,7 +1682,7 @@ https://open.spotify.com/playlist/37i9dQZF1E8KWGOkQ6Xhuz?si=fb8272c3fb314f85
                 </Button>
               </CardContent>
             </Card>
-          </TabsContent>
+          </TabsContent>{/* This one is completed with Handling */}
 
           {/* Documents */}
           <TabsContent value="documents">
