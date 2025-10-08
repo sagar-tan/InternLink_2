@@ -1321,7 +1321,7 @@ https://open.spotify.com/playlist/37i9dQZF1E8KWGOkQ6Xhuz?si=fb8272c3fb314f85
                         Have you previously participated in any PM-level internship scheme?
                       </Label>
                       {formData.pmInternshipPrevious && <XCircle className="w-4 h-4 text-red-600" />}
-                    </div>
+                    </div>{/* Pm Internship done? */}
 
                     <div className="flex items-center space-x-2">
                       <Checkbox 
@@ -1333,7 +1333,7 @@ https://open.spotify.com/playlist/37i9dQZF1E8KWGOkQ6Xhuz?si=fb8272c3fb314f85
                         Have you previously participated in any PM-level skilling scheme?
                       </Label>
                       {formData.pmSkillingPrevious && <XCircle className="w-4 h-4 text-red-600" />}
-                    </div>
+                    </div>{/* Pm Skilling done? */}
 
                     <div className="flex items-center space-x-2">
                       <Checkbox 
@@ -1345,7 +1345,7 @@ https://open.spotify.com/playlist/37i9dQZF1E8KWGOkQ6Xhuz?si=fb8272c3fb314f85
                         Have you participated in any other government employment/training scheme?
                       </Label>
                       {formData.otherGovtScheme && <AlertTriangle className="w-4 h-4 text-yellow-600" />}
-                    </div>
+                    </div>{/* Pm Training done? */}
                   </div>
 
                   <div className="space-y-2">
@@ -1354,9 +1354,10 @@ https://open.spotify.com/playlist/37i9dQZF1E8KWGOkQ6Xhuz?si=fb8272c3fb314f85
                       id="schemeDetails" 
                       placeholder="Name of scheme, year of participation, duration, outcome, etc."
                       rows={3}
+                      value={formData.pmleveldetails}
+                      onChange={(e)=> updateFormData('pmleveldetails', e.target.value)}
                     />
-                  </div>
-
+                  </div>{/* pm level Details */}
                   <div className="flex items-center gap-2">
                     <p className="text-xs text-gray-500">Previous participation status:</p>
                     {getEligibilityIcon(eligibilityStatus.participation)}
