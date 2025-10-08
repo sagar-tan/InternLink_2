@@ -469,8 +469,27 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
   
   //Submit Handling Function
   
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
   console.log("Submit button pressed");
+  try {
+
+    const backendKeys = Object.keys(initialCandidateData);
+    const payload: Record<string, any> = {};
+    backendKeys.forEach((key)=>{
+      payload[key] = (formData as any)[key] ?? (initialCandidateData as any)[key];
+    });
+    const token = localStorage.getItem('token');
+    if(!token){
+      toast.error('Ya toh bro token nahi mil rha, ya phir toh ghatiya insaan login krke try krle submit');
+      onNavigate('login');
+      return;
+    }
+    
+  } catch (err: any) {
+    
+  }
+
+
   // ... later you can add axios call etc.
   };
 
