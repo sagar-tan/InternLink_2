@@ -513,6 +513,8 @@ const profileComplete = isPersonalComplete && isEducationComplete;
     return true;
   };
 
+  //Helper Functions for Skills
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-4xl mx-auto">
@@ -1457,7 +1459,12 @@ https://open.spotify.com/playlist/37i9dQZF1E8KWGOkQ6Xhuz?si=fb8272c3fb314f85
               </Card>
 
               <Button 
-                onClick={() => console.log("Change me on line 1206 to add the navigate to Next section maybe Skills?")}
+                onClick={() => {
+                    console.log("Change me on line 1206 to add the navigate to Next section maybe Skills?")
+                    window.scrollTo({top:0, behavior: 'smooth'});
+                    setActiveTab('skills')
+                  }
+                }
                 // onClick={() => saveSection('experience')} 
                 className="w-full"
                 disabled={eligibilityStatus.overall === 'not-eligible'}
@@ -1486,7 +1493,7 @@ https://open.spotify.com/playlist/37i9dQZF1E8KWGOkQ6Xhuz?si=fb8272c3fb314f85
                 <div>
                   <Label className="text-base font-medium">Your Skills</Label>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {skills.map((skill, index) => (
+                    {formData.skills.map((skill, index) => (
                       <Badge key={index} variant="secondary" className="flex items-center gap-1">
                         {skill}
                         <X 
@@ -1504,7 +1511,7 @@ https://open.spotify.com/playlist/37i9dQZF1E8KWGOkQ6Xhuz?si=fb8272c3fb314f85
                     placeholder="Add a skill"
                     value={newSkill}
                     onChange={(e) => setNewSkill(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && addSkill()}
+                    onKeyUp={(e) => e.key === 'Enter' && addSkill()}
                   />
                   <Button onClick={addSkill} size="sm">
                     <Plus className="w-4 h-4" />
