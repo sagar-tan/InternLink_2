@@ -71,7 +71,7 @@ interface FormData {
   // --- Reservation Details ---
   category: string;
   PwD?: boolean;
-  PwdType?: string;
+  PwdType: string;
   FGG?: boolean;
   govtEmployee?: boolean;
   govtEmployeeDetails?: string;
@@ -861,8 +861,13 @@ const profileComplete = isPersonalComplete && isEducationComplete;
 
                   <div className="space-y-2">
                     <Label htmlFor="disabilityType">If PwD, specify type of disability</Label>
-                    <Input id="disabilityType" placeholder="e.g., Visual, Hearing, Physical, etc." />
-                  </div>
+                    <Input 
+                    id="disabilityType" 
+                    placeholder="e.g., Visual, Hearing, Physical, etc."
+                    value={formData.PwdType}
+                    onChange={(e) => updateFormData('PwdType', e.target.value)}
+                    />
+                  </div>{/* Disability type input */}
                 </CardContent>
               </Card>
 
@@ -878,13 +883,23 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="fatherOccupation">Father's Occupation * </Label>
-                      <Input id="fatherOccupation" placeholder="e.g., Farmer, Teacher, Business" />
+                      <Input 
+                      id="fatherOccupation" 
+                      placeholder="e.g., Farmer, Teacher, Business" 
+                      value={formData.fatherOccupation}
+                      onChange={(e) => updateFormData('fatherOccupation', e.target.value)}
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="motherOccupation">Mother's Occupation * </Label>
-                      <Input id="motherOccupation" placeholder="e.g., Homemaker, Nurse, etc." />
+                      <Input 
+                      id="motherOccupation" 
+                      placeholder="e.g., Homemaker, Nurse, etc." 
+                      value={formData.motherOccupation}
+                      onChange={(e) => updateFormData('motherOccupation', e.target.value)}
+                      />
                     </div>
-                  </div>
+                  </div>{/* Parents' Occupation inputs */}
 
                   <div className="space-y-2">
                     <Label htmlFor="familyIncome">Annual Family Income * </Label>
