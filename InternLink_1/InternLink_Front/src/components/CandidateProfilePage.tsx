@@ -1,5 +1,4 @@
 import { useState, useEffect, SetStateAction } from 'react';
-import axios from 'axios';
 import { initialCandidateData } from './candidateData';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';

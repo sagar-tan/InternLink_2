@@ -5,7 +5,9 @@ import { Label } from './ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Alert, AlertDescription } from './ui/alert';
-import { Eye, EyeOff, Award, Users, Target, TrendingUp, ArrowLeft, Building, GraduationCap, Briefcase } from 'lucide-react';
+import { Eye, EyeOff, Award, Users, Target, TrendingUp, ArrowLeft, Building, GraduationCap, Briefcase, Phone } from 'lucide-react';
+import apiClient from '../api/apiClient';
+import { toast } from 'sonner';
 
 interface SignupPageProps {
   onNavigate: (page: string) => void;
@@ -51,29 +53,24 @@ export function SignupPage({ onNavigate, onLogin }: SignupPageProps) {
   setIsLoading(true);
 
   try {
-    const response = await fetch("http://localhost:8080/api/auth/signup", {// the server will return 201 Created status code on successful registration
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        fullName: formData.fullName,
-        email: formData.email,
-        phone: formData.phone,
-        organization: formData.organization,
-        password: formData.password,
-        userType
-      })
-    });
+    const payload = {
+      fullName: formData.fullName,
+      email: formData.email,
+      phone: formData.phone,
+      organization: formData.organization,
+      password: formData.password,
+      userType,
+    };
+    const response = await apiClient.post("/auth/signup", payload);
 
-
-    const data = await response.json();
-    console.log("status:", response.status); // should be 201
-    console.log("ok:", response.ok);         // true
-    console.log("json body:", data); // { message: 'User registered successfully' }
+    console.log("Signup Response: ", response.data);
+    console.log("Status: ", response.status);
+    
 
 
 
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to register");
+    if (response.status === 201 || response.status === 200) {
+      alert("Registration Successful! Please Login.")
     }
 
     // success: login the user
