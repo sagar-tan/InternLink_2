@@ -15,8 +15,11 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JWTService jwtService; // Inject JWTService
+    
 
     public String authenticateUser(String email, String password, String userType) {
+        System.out.println("Login attempt: email=" + email + ", userType=" + userType);
+
     // 1️⃣ Authenticate user normally
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("Invalid email or password"));
