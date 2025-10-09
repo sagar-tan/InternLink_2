@@ -124,5 +124,25 @@ CREATE TABLE internships (
   status VARCHAR(20) DEFAULT 'open',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- Internship Applications Table
+CREATE TABLE internship_applications (
+  application_id SERIAL PRIMARY KEY,
+  internship_id INTEGER NOT NULL REFERENCES internships(internship_id) ON DELETE CASCADE,
+  candidate_id INTEGER NOT NULL REFERENCES candidate_profiles(candidate_id) ON DELETE CASCADE,
+
+  applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  status VARCHAR(50) DEFAULT 'under_review', -- under_review, shortlisted, interview, selected, rejected
+  feedback TEXT
+);
+
+-- Placeholder for matching algorithm
+CREATE TABLE candidate_matches (
+  id SERIAL PRIMARY KEY,
+  internship_id INT REFERENCES internships(internship_id) ON DELETE CASCADE,
+  candidate_id INT REFERENCES candidate_profiles(candidate_id) ON DELETE CASCADE,
+  match_score NUMERIC(5,2),
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
 
 
