@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Alert, AlertDescription } from './ui/alert';
 import { Eye, EyeOff, Award, Users, Target, TrendingUp, ArrowLeft, Briefcase } from 'lucide-react';
+import apiClient from '../api/apiClient';
+import { toast } from 'sonner';
 
 
 interface LoginPageProps {
@@ -24,29 +26,27 @@ export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await fetch('http://localhost:8080/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        // include the UI-selected userType so backend can return role-specific user data
-        body: JSON.stringify({ email, password, userType }),
+      const res = await apiClient.post('/auth/login', {
+        email,
+        password,
+        userType
       });
+      
 
-      const data = await res.json();
-
-      if (!res.ok) {
+      if (res.status !== 200) {
         // API should return a helpful message in data.message
-        throw new Error(data?.message || 'Login failed');
+        throw new Error(res.data?.message || 'Login failed');
       }
 
       // Save token if provided
-      if (data?.token) {
-        localStorage.setItem('token', data.token);
+      if (res.data?.token) {
+        localStorage.setItem('token', res.data.token);
+        localStorage.setItem('userType', res.data.userType);
+        toast.success(`Welcome back, ${res.data.userType}!`);
       }
 
       // Backend might return the user object under `user` or `userData` or directly
-      const userFromApi = data?.user || data?.userData || data;
+      const userFromApi = res.data?.user || res.data?.userData || res.data;
 
       // Build a normalized user object expected by App.handleLogin
       const normalizedUser = {
