@@ -1,0 +1,32 @@
+src/main/java/com/internlink/
+│
+├── auth/
+│   ├── controller/AuthController.java
+│   ├── service/AuthService.java
+│   ├── model/AuthRequest.java / AuthResponse.java
+│   └── config/JWTConfig.java
+│
+├── candidate/
+│   ├── controller/CandidateController.java
+│   ├── service/CandidateService.java
+│   ├── repository/CandidateProfileRepository.java
+│   ├── model/
+│   │   ├── CandidateProfile.java
+│   │   ├── CandidateEducation.java
+│   │   ├── CandidateExperience.java
+│   │   └── CandidatePreferences.java
+│
+├── recruiter/
+│   ├── controller/RecruiterController.java
+│   ├── service/RecruiterService.java
+│   ├── repository/InternshipRepository.java
+│   └── model/Internship.java
+│
+├── matching/
+│   ├── service/MatchingEngine.java
+│   ├── model/MatchScore.java
+│
+└── users/
+    ├── controller/UserController.java
+    ├── service/UserService.java
+    └── repository/UserRepository.java
