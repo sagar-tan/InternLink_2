@@ -3,7 +3,7 @@
 
 CREATE TABLE candidate_profiles (
 	candidate_id SERIAL PRIMARY KEY,
-	user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+	user_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
 	gender VARCHAR(20),
 	date_of_birth DATE,
 	citizenship VARCHAR(100),
