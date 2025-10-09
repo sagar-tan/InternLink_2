@@ -65,23 +65,20 @@ export function SignupPage({ onNavigate, onLogin }: SignupPageProps) {
 
     console.log("Signup Response: ", response.data);
     console.log("Status: ", response.status);
-    
-
-
-
-    if (response.status === 201 || response.status === 200) {
-      alert("Registration Successful! Please Login.")
-    }
-
     // success: login the user
-     if(response.ok){// response.ok is true for status code 200-299
+    if (response.status === 201 || response.status === 200) {
       onNavigate('login');
-      alert("Registration successful! Please log in.");
+      toast.success("Registration successful! Please log in.");
      }
-  } catch (err: any) {
+  }
+  
+  catch (err: any) {
     console.error(err.message);
-    alert(err.message);
-  } finally {
+    const message = err.response?.data?.message || err.message || "Signup failed. Please try again.";
+    toast.error(message);
+  } 
+
+  finally {
     setIsLoading(false);
   }
 };
