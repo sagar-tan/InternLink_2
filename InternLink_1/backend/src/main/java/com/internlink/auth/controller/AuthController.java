@@ -1,6 +1,7 @@
 package com.internlink.auth.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +21,8 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody AuthRequest request) {
-        return authService.login(request);
+    public ResponseEntity<?> login(@RequestBody AuthRequest request) {
+        String token = authService.authenticateUser(request.getEmail(), request.getPassword(), request.getUserType());
+        return ResponseEntity.ok(new AuthResponse(token, request.getUserType()));
     }
 }

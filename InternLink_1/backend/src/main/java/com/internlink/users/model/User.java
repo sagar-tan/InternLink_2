@@ -1,8 +1,7 @@
 package com.internlink.users.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -18,22 +17,26 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Table(name = "users")
-
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
+
+    @Column(name = "full_name", nullable = false)
     private String fullName;
+
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(name = "password_hash", nullable = false)
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    private String organization;
+    private String phone;
 
-    public enum Role {
-        candidate,
-        recruiter
-        
-    }
-    
+    // ✅ Match DB column name and type
+    @Column(nullable = false)
+    private String role; // 'candidate' or 'recruiter'
 }

@@ -25,8 +25,26 @@ public class AuthService {
             throw new RuntimeException("Invalid Password");
         }
         String token = jwtService.generateToken(user);
-        return new AuthResponse(token, user.getRole().name());
+        return new AuthResponse(token, user.getRole());
     }
 
+    
+    public String authenticateUser(String email, String password, String userType) {
+    // 1️⃣ Authenticate user normally
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+        
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Invalid password");
+        }
+
+        // 2️⃣ Validate userType matches the stored one (candidate/recruiter)
+        if (!user.getRole().equalsIgnoreCase(userType)) {
+            throw new RuntimeException("Invalid user type for this account");
+        }
+
+        // 3️⃣ Generate JWT token
+        return jwtService.generateToken(user);
+    }
     
 }

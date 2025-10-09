@@ -1,13 +1,15 @@
 package com.internlink.auth.service;
 
+import java.security.Key;
+import java.util.Date;
+
+import org.springframework.stereotype.Service;
+
 import com.internlink.users.model.User;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.stereotype.Service;
-
-import java.security.Key;
-import java.util.Date;
 
 @Service
 public class JWTService {
@@ -18,7 +20,7 @@ public class JWTService {
     public String generateToken(User user) {
         return Jwts.builder()
                 .setSubject(user.getEmail())
-                .claim("role", user.getRole().name())
+                .claim("role", user.getRole())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key)
