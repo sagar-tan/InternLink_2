@@ -4,8 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.internlink.auth.model.AuthRequest;
-import com.internlink.auth.model.AuthResponse;
 import com.internlink.users.model.User;
 import com.internlink.users.repository.UserRepository;
 
@@ -18,17 +16,6 @@ public class AuthService {
     @Autowired
     private JWTService jwtService; // Inject JWTService
 
-    public AuthResponse login(AuthRequest request){
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not Found"));
-        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
-            throw new RuntimeException("Invalid Password");
-        }
-        String token = jwtService.generateToken(user);
-        return new AuthResponse(token, user.getRole());
-    }
-
-    
     public String authenticateUser(String email, String password, String userType) {
     // 1️⃣ Authenticate user normally
         User user = userRepository.findByEmail(email)
@@ -42,6 +29,8 @@ public class AuthService {
         if (!user.getRole().equalsIgnoreCase(userType)) {
             throw new RuntimeException("Invalid user type for this account");
         }
+        System.out.println("User found: " + user.getEmail() + ", role: " + user.getRole());
+
 
         // 3️⃣ Generate JWT token
         return jwtService.generateToken(user);

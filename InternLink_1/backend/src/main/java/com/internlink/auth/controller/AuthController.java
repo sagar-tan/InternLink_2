@@ -22,7 +22,13 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
-        String token = authService.authenticateUser(request.getEmail(), request.getPassword(), request.getUserType());
+        System.out.println("Login request received: " + request);
+        String token = authService.authenticateUser(
+            request.getEmail(),
+            request.getPassword(), 
+            request.getUserType()
+        );
+        System.out.println("Token generated: " + token);
         return ResponseEntity.ok(new AuthResponse(token, request.getUserType()));
     }
 }
