@@ -1,0 +1,71 @@
+Folder PATH listing for volume Windows-SSD
+Volume serial number is 9CB9-86C2
+C:.
+|   list.txt
+|   
+\---backend
+    |   InternlinkBackendApplication.java
+    |   
+    +---auth
+    |   +---controller
+    |   |       AuthController.java
+    |   |       
+    |   +---model
+    |   |       AuthRequest.java
+    |   |       AuthResponse.java
+    |   |       
+    |   \---service
+    +---config
+    |       JWTConfig.java
+    |       SecurityConfig.java
+    |       WebConfig.java
+    |       
+    +---controller
+    |       AuthController.java
+    |       CandidateController.java
+    |       RecruiterController.java
+    |       UserController.java
+    |       
+    +---dto
+    |       SignupRequest.java
+    |       
+    +---entity
+    |       CandidateEducation.java
+    |       CandidateExperience.java
+    |       CandidatePreference.java
+    |       CandidateProfile.java
+    |       Internship.java
+    |       MatchScore.java
+    |       User.java
+    |       
+    +---exception
+    |       GlobalExceptionHandler.java
+    |       
+    +---matching
+    |   +---model
+    |   \---service
+    |           MatchingEngine.java
+    |           
+    +---recruiter
+    |   +---controller
+    |   \---service
+    |           RecruiterService.java
+    |           
+    +---repository
+    |       CandidateProfileRepository.java
+    |       InternshipRepository.java
+    |       UserRepository.java
+    |       
+    +---service
+    |       AuthService.java
+    |       CandidateService.java
+    |       JWTService.java
+    |       UserService.java
+    |       
+    \---users
+        +---repository
+        |       UserRepository.java
+        |       
+        \---service
+                UserService.java
+                
