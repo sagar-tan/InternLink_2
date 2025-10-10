@@ -29,9 +29,14 @@ public class AuthService {
         }
 
         // 2️⃣ Validate userType matches the stored one (candidate/recruiter)
+
         if (!user.getRole().equalsIgnoreCase(userType)) {
-            throw new RuntimeException("Invalid user type for this account");
+            throw new IllegalArgumentException(
+                "You are registered as " + user.getRole() + 
+                ". Please login with that profile or register as a new " + userType + "."//modifying this to prompt user to change UserType
+            );
         }
+
         System.out.println("User found: " + user.getEmail() + ", role: " + user.getRole());
 
 
