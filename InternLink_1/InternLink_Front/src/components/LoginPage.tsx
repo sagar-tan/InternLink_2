@@ -8,8 +8,11 @@ import { Alert, AlertDescription } from './ui/alert';
 import { Eye, EyeOff, Award, Users, Target, TrendingUp, ArrowLeft, Briefcase } from 'lucide-react';
 import apiClient from '../api/apiClient';
 import { toast } from 'sonner';
+import Modal from 'react-modal';
+Modal.setAppElement('#root'); // required for accessibility
 
 
+ 
 interface LoginPageProps {
   onNavigate: (page: string) => void;
   onLogin: (userType: 'recruiter' | 'candidate', userData: any) => void;
@@ -21,6 +24,8 @@ export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [userType, setUserType] = useState<'recruiter' | 'candidate'>('candidate');
   const [isLoading, setIsLoading] = useState(false);
+  const [roleMismatch, setRoleMismatch] = useState<string | null>(null);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +40,7 @@ export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
 
       if (res.status !== 200) {
         // API should return a helpful message in data.message
-        throw new Error(res.data?.message || 'Login failed');
+        setRoleMismatch(res.data.message);
       }
 
       // Save token if provided
@@ -84,6 +89,30 @@ export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 flex">
+        {roleMismatch && (
+          <Modal isOpen={!!roleMismatch} onRequestClose={() => setRoleMismatch(null)}>
+            <p>{roleMismatch}</p>
+            <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
+              <Button
+                onClick={() => {
+                  const correctType = roleMismatch.includes('recruiter') ? 'recruiter' : 'candidate';
+                  setUserType(correctType);
+                  setRoleMismatch(null);
+                }}
+              >
+                Login as correct type
+              </Button>
+              <Button
+                onClick={() => {
+                  window.location.href = '/signup';
+                }}
+              >
+                Register as new type
+              </Button>
+            </div>
+          </Modal>
+      )}
+
       {/* Left Side - Login Form */}
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
