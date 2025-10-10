@@ -1,0 +1,94 @@
+Folder PATH listing for volume Windows-SSD
+Volume serial number is 9CB9-86C2
+C:.
+|   list.txt
+|   
+\---backend
+    |   InternlinkBackendApplication.java
+    |   
+    +---auth
+    |   +---config
+    |   |       JWTConfig.java
+    |   |       
+    |   +---controller
+    |   |       AuthController.java
+    |   |       
+    |   +---model
+    |   |       AuthRequest.java
+    |   |       AuthResponse.java
+    |   |       
+    |   \---service
+    |           AuthService.java
+    |           JWTService.java
+    |           
+    +---candidate
+    |   +---controller
+    |   |       CandidateController.java
+    |   |       
+    |   +---model
+    |   |       CandidateEducation.java
+    |   |       CandidateExperience.java
+    |   |       CandidatePreference.java
+    |   |       CandidateProfile.java
+    |   |       
+    |   +---repository
+    |   |       CandidateProfileRepository.java
+    |   |       
+    |   \---service
+    |           CandidateService.java
+    |           
+    +---config
+    |       SecurityConfig.java
+    |       WebConfig.java
+    |       
+    +---controller
+    |       AuthController.java
+    |       
+    +---dto
+    |       SignupRequest.java
+    |       
+    +---entity
+    |       User.java
+    |       
+    +---exception
+    |       GlobalExceptionHandler.java
+    |       
+    +---matching
+    |   +---model
+    |   |       MatchScore.java
+    |   |       
+    |   \---service
+    |           MatchingEngine.java
+    |           
+    +---recruiter
+    |   +---controller
+    |   |       RecruiterController.java
+    |   |       
+    |   +---model
+    |   |       Internship.java
+    |   |       
+    |   +---repository
+    |   |       InternshipRepository.java
+    |   |       
+    |   \---service
+    |           RecruiterService.java
+    |           
+    +---repository
+    |       UserRepository.java
+    |       
+    +---service
+    |       UserService.java
+    |       
+    \---users
+        +---controller
+        |       UserController.java
+        |       
+        +---model
+        |       User.java
+        |       
+        +---repository
+        |       UserRepository.java
+        |       
+        \---service
+                UserService.java
+                
