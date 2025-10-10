@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.internlink.backend.auth.model.AuthRequest;
-import com.internlink.backend.auth.service.AuthService;
 import com.internlink.backend.dto.SignupRequest;
 import com.internlink.backend.entity.User;
+import com.internlink.backend.service.AuthService;
 import com.internlink.backend.service.UserService;
 
 //using @ with spring boot to define a controller class

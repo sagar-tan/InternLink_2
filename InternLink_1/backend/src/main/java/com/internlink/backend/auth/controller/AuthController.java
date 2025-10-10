@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.internlink.backend.auth.model.AuthRequest;
 import com.internlink.backend.auth.model.AuthResponse;
-import com.internlink.backend.auth.service.AuthService;
+import com.internlink.backend.service.AuthService;
 
 @RestController
 @RequestMapping("/api/auth")

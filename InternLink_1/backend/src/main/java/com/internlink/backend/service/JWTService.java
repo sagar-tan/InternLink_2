@@ -1,4 +1,4 @@
-package com.internlink.backend.auth.service;
+package com.internlink.backend.service;
 
 import java.security.Key;
 import java.util.Date;

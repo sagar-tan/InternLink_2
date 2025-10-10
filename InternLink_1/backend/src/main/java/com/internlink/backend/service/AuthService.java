@@ -1,4 +1,4 @@
-package com.internlink.backend.auth.service;
+package com.internlink.backend.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
