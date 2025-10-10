@@ -1,5 +1,7 @@
 package com.internlink.backend.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -24,7 +26,7 @@ import com.internlink.backend.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     // This is used in UserService to check if a user exists
-    User findByEmail(String email);
+    Optional<User> findByEmail(String email);
     User findByPhone(String phone);
     boolean existsByEmail(String email);
     // This method is not used currently, but can be used for login functionality

@@ -68,7 +68,8 @@ public class UserService {
 
 
     public User login(String email, String password, String userType) {
-        User user = userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User Not Found by Email"));
         if (user == null || !passwordEncoder.matches(password, user.getPasswordHash())) {
             throw new IllegalArgumentException("Invalid email or password");
         }
@@ -79,7 +80,8 @@ public class UserService {
     }
 
     public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+        return userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User Not Found by Email"));
     }
 
     public User save(User user) {
