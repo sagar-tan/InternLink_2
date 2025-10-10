@@ -100,7 +100,7 @@ export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 flex">
       {/* Role Mismatch Dialog */}
       <Dialog open={!!roleMismatch} onOpenChange={() => setRoleMismatch(null)}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-full max-w-md mx-auto">
           <DialogHeader>
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-100">
               <AlertTriangle className="h-6 w-6 text-amber-600" />
