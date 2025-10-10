@@ -22,8 +22,8 @@ public class AuthService {
 
     // 1️⃣ Authenticate user normally
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Invalid email or password"));// this or elseThrow is supposed to be included if findByEmail is declared as optional in UserRepo
-        
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));// this or elseThrow is supposed to be included if findByEmail is declared as optional in UserRepo
+
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
             throw new RuntimeException("Invalid password");
         }
