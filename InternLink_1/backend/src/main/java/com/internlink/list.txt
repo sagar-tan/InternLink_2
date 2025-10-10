@@ -41,16 +41,6 @@ C:.
     +---exception
     |       GlobalExceptionHandler.java
     |       
-    +---matching
-    |   +---model
-    |   \---service
-    |           MatchingEngine.java
-    |           
-    +---recruiter
-    |   +---controller
-    |   \---service
-    |           RecruiterService.java
-    |           
     +---repository
     |       CandidateProfileRepository.java
     |       InternshipRepository.java
@@ -60,6 +50,8 @@ C:.
     |       AuthService.java
     |       CandidateService.java
     |       JWTService.java
+    |       MatchingEngine.java
+    |       RecruiterService.java
     |       UserService.java
     |       
     \---users

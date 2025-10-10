@@ -1,4 +1,4 @@
-package com.internlink.backend.auth.model;
+package com.internlink.backend.dto;
 import lombok.Data;
 @Data
 
