@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.internlink.backend.auth.model.AuthRequest;
+import com.internlink.backend.auth.service.AuthService;
 import com.internlink.backend.dto.SignupRequest;
 import com.internlink.backend.entity.User;
 import com.internlink.backend.service.UserService;
@@ -33,7 +35,17 @@ public class AuthController {
         return response;// returning the response map to the frontend, the @postMapping annotation ensures that this method handles POST requests to /api/auth/signup
     }
 
-    //@PostMapping("/login")//Login Endpoint 
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody AuthRequest request){
+        System.out.println("Login Request Recieved: " + request);
+        String token = authService.authenticateUser(
+            request.getEmail(),
+            request.getPassword(),
+            request.getUserType()
+        );
+        System.err.println("Token Generated: "+token);
+        return ResponseEntity.ok(new AuthResponse(token, request.getUserType()));
+    }
 
 
 
