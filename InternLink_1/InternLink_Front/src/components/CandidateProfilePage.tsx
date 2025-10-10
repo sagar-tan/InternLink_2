@@ -35,6 +35,7 @@ import {
 from 'lucide-react';
 import { toast } from 'sonner';
 import apiClient from '../api/apiClient'; // Import the configured Axios instance this is manually done btw
+import { FormData } from '../types'; // Import the FormData type from types.ts which is now a template pretty much
 
 interface CandidateProfilePageProps {
   onNavigate: (page: string) => void;
@@ -52,74 +53,6 @@ interface EligibilityStatus {
   family: 'eligible' | 'not-eligible' | 'pending';
   issues: string[];
   warnings: string[];
-}
-
-interface FormData {
-  // --- Personal Information ---
-  fullName: string;
-  gender: string;
-  dateOfBirth: string;
-  citizenship: string;
-  email: string;
-  phone: string;
-  currentlyEmployed?: boolean;
-  currentAddress?: string;
-  city?: string;
-  state?: string;
-  pincode?: string;
-
-  // --- Reservation Details ---
-  category: string;
-  PwD?: boolean;
-  PwdType: string;
-  FGG?: boolean;
-  govtEmployee?: boolean;
-  govtEmployeeDetails?: string;
-
-  // --- Family Background ---
-  familyIncome?: string;
-  fatherOccupation?: string;
-  motherOccupation?: string;
-
-  // --- Educational Background ---
-  highestDegree: string;
-  institution: string;
-  studyField: string;
-  specialization?: string;
-  cgpa?: string;
-  currYear?: string;
-  graduationYear?: string;
-
-  // --- Previous Education ---
-  class12Board?: string;
-  class12Year?: string;
-  class12Marks?: string;
-  class12Stream?: string;
-
-  // --- Past Participation ---
-  pmInternshipPrevious?: boolean;
-  pmSkillingPrevious?: boolean;
-  otherGovtScheme?: boolean;
-  natsNapsTraining?: boolean;
-  pmleveldetails?: string;
-
-  // --- Work Experience ---
-  companyName?: string;
-  position?: string;
-  startDate?: string;
-  endDate?: string;
-  responsibilities?: string;
-  keyAchievements?: string;
-  workHereNow?: boolean;
-
-  // --- Skills ---
-  skills: string[];
-
-  // --- Preferences ---
-  preferredDomain: string;
-  preferredLocation: string;
-  preferredDuration?: string;
-  monthlyStipend?: string;
 }
 
 export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) {
