@@ -39,6 +39,10 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 // the below method is having User , and request like a DataType, well actually its an object, but it can be seen like one
+
+
+//    ------------------------------ SIGNUP METHOD ------------------------------
+
     public User signup(SignupRequest request) {// this is called in AuthController
 
         if (userRepository.findByEmail(request.getEmail()) != null) {
@@ -60,6 +64,8 @@ public class UserService {
 
         return userRepository.save(user);// saving the user object to the database and returning the saved user
     }
+//   ------------------------------ LOGIN METHOD ------------------------------
+
 
     public User login(String email, String password, String userType) {
         User user = userRepository.findByEmail(email);
@@ -70,6 +76,14 @@ public class UserService {
             throw new IllegalArgumentException("User type does not match");//need to implement a Frontend Alert for this
         }
         return user;
+    }
+
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public User save(User user) {
+        return userRepository.save(user);
     }
 
 }

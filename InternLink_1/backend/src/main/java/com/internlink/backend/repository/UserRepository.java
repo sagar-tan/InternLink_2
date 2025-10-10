@@ -26,6 +26,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // This is used in UserService to check if a user exists
     User findByEmail(String email);
     User findByPhone(String phone);
+    boolean existsByEmail(String email);
     // This method is not used currently, but can be used for login functionality
     // The @Query annotation is used to define a custom query
     @Query(value="SELECT u FROM User u WHERE u.email = ?1 AND u.passwordHash = ?2", nativeQuery=true)// a custom query to find a user by email and password hash

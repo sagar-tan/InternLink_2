@@ -3,12 +3,16 @@ package com.internlink.backend.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.internlink.backend.dto.AuthRequest;
+import com.internlink.backend.dto.AuthResponse;
 import com.internlink.backend.dto.SignupRequest;
 import com.internlink.backend.entity.User;
 import com.internlink.backend.service.AuthService;
@@ -18,6 +22,8 @@ import com.internlink.backend.service.UserService;
 @RestController 
 @RequestMapping("/api/auth") // we declare this by @ because we want to define a base URL for all authentication-related endpoints
 //up until not the frontend was hitting wrong endpoint url, so spring boot thinks its a static file request instead of api request
+@CrossOrigin(origins = "*")
+
 public class AuthController {
     private final UserService userService;
 
@@ -34,26 +40,19 @@ public class AuthController {
         response.put("message", "Signup Successful");//Affirmation of Success
         return response;// returning the response map to the frontend, the @postMapping annotation ensures that this method handles POST requests to /api/auth/signup
     }
-
+    @Autowired
+    private AuthService authService;
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthRequest request){
-        System.out.println("Login Request Recieved: " + request);
+    public ResponseEntity<?> login(@RequestBody AuthRequest request) {
+        System.out.println("Login request received: " + request);
         String token = authService.authenticateUser(
             request.getEmail(),
-            request.getPassword(),
+            request.getPassword(), 
             request.getUserType()
         );
-        System.err.println("Token Generated: "+token);
+        System.out.println("Token generated: " + token);
         return ResponseEntity.ok(new AuthResponse(token, request.getUserType()));
     }
-
-
-
-
-/*     public User signup(@RequestBody SignupRequest request) {
-        return userService.signup(request);
-    }
- */
     
 }
 

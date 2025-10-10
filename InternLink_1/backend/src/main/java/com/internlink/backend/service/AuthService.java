@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.internlink.backend.users.model.User;
-import com.internlink.backend.users.repository.UserRepository;
+import com.internlink.backend.entity.User;
+import com.internlink.backend.repository.UserRepository;
 
 @Service
 public class AuthService {
