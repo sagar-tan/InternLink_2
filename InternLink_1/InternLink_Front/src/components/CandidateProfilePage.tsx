@@ -136,6 +136,36 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
     issues: [],
     warnings: []
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+
+  useEffect(() => {
+
+    const fetchProfile = async () =>{
+      try{
+        const response =await apiClient.get('/candidate/profile');
+        if(response.data){
+          setFormData(response.data);
+        }
+      }
+      catch(error:any){
+        if(error.response?.status === 404){
+          console.log("New User, no Profile yet");
+        }
+        else{
+          console.error("Error fetching profile:", error);
+          toast.error("Error fetching profile data. Please try again later.");
+        }
+      }
+      finally{
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+
+  }, []);
+
 
   // Common skills for quick selection
   const commonSkills = [
@@ -327,6 +357,8 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
   const updateFormData = (field: keyof FormData, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
+
+  
 
   // Effect to recalculate eligibility when form data changes
   useEffect(() => {
