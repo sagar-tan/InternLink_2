@@ -1,32 +1,48 @@
-src/main/java/com/internlink/
-│
-├── auth/
-│   ├── controller/AuthController.java
-│   ├── service/AuthService.java
-│   ├── model/AuthRequest.java / AuthResponse.java
-│   └── config/JWTConfig.java
-│
-├── candidate/
-│   ├── controller/CandidateController.java
-│   ├── service/CandidateService.java
-│   ├── repository/CandidateProfileRepository.java
-│   ├── model/
-│   │   ├── CandidateProfile.java
-│   │   ├── CandidateEducation.java
-│   │   ├── CandidateExperience.java
-│   │   └── CandidatePreferences.java
-│
-├── recruiter/
-│   ├── controller/RecruiterController.java
-│   ├── service/RecruiterService.java
-│   ├── repository/InternshipRepository.java
-│   └── model/Internship.java
-│
-├── matching/
-│   ├── service/MatchingEngine.java
-│   ├── model/MatchScore.java
-│
-└── users/
-    ├── controller/UserController.java
-    ├── service/UserService.java
-    └── repository/UserRepository.java
+Folder PATH listing for volume Windows-SSD
+Volume serial number is 9CB9-86C2
+C:.
+|   list.txt
+|   
+\---backend
+    |   InternlinkBackendApplication.java
+    |   
+    +---config
+    |       SecurityConfig.java
+    |       WebConfig.java
+    |       
+    +---controller
+    |       AuthController.java
+    |       CandidateController.java
+    |       RecruiterController.java
+    |       UserController.java
+    |       
+    +---dto
+    |       AuthRequest.java
+    |       AuthResponse.java
+    |       SignupRequest.java
+    |       
+    +---entity
+    |       CandidateEducation.java
+    |       CandidateExperience.java
+    |       CandidatePreference.java
+    |       CandidateProfile.java
+    |       Internship.java
+    |       MatchScore.java
+    |       User.java
+    |       
+    +---exception
+    |       GlobalExceptionHandler.java
+    |       
+    +---repository
+    |       CandidateProfileRepository.java
+    |       InternshipRepository.java
+    |       UserRepository.java
+    |       
+    \---service
+            AuthService.java
+            CandidateService.java
+            JWTService.java
+            MatchingEngine.java
+            RecruiterService.java
+            UserService.java
+            
