@@ -1,7 +1,14 @@
 package com.internlink.backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.internlink.backend.entity.CandidateProfile;
 import com.internlink.backend.service.CandidateService;
 import com.internlink.backend.service.JWTService;
@@ -19,7 +26,7 @@ public class CandidateController {
     @GetMapping("/profile")
     public ResponseEntity<?> getCandidateProfile(@RequestHeader("Authorization") String token) {
         String jwt = token.replace("Bearer ", "");
-        String email = jwtService.extractUsername(jwt);
+        String email = jwtService.extractEmail(jwt);
         return ResponseEntity.ok(candidateService.getCandidateProfileByEmail(email));
     }
 
@@ -29,7 +36,7 @@ public class CandidateController {
         @RequestBody CandidateProfile profile) {
 
         String jwt = token.replace("Bearer ", "");
-        String email = jwtService.extractUsername(jwt);
+        String email = jwtService.extractEmail(jwt);
         return ResponseEntity.ok(candidateService.saveOrUpdateProfile(email, profile));
     }
 }
