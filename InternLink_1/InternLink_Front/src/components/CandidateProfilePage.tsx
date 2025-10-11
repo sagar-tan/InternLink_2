@@ -358,7 +358,15 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  
+  const handleSave = async () => {
+    try {
+      const response = await apiClient.post('/candidate/profile', formData);
+      toast.success('Profile updated successfully!');
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      toast.error('Failed to update profile. Please try again later.');
+    }
+  };
 
   // Effect to recalculate eligibility when form data changes
   useEffect(() => {
@@ -518,6 +526,18 @@ const profileComplete = isPersonalComplete && isEducationComplete;
     }
     return true;
   };
+
+
+
+
+
+
+
+
+  if (loading) {
+    return <div>Loading profile...</div>;
+  }
+
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
