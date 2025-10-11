@@ -8,5 +8,5 @@ import com.internlink.backend.entity.CandidateProfile;
 
 @Repository
 public interface CandidateProfileRepository extends JpaRepository<CandidateProfile, Integer> {
-    Optional<CandidateProfile> findByUserId(Long userId);
+    Optional<CandidateProfile> findByUserUserId(Long userId);
 }

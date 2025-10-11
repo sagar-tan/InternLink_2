@@ -20,7 +20,7 @@ public class CandidateService {
     public CandidateProfile getCandidateProfileByEmail(String email) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
-        return candidateProfileRepository.findByUserId(user.getUserId())
+        return candidateProfileRepository.findByUserUserId(user.getUserId())
             .orElseGet(() -> {
                 CandidateProfile newProfile = new CandidateProfile();
                 newProfile.setUser(user);
@@ -32,7 +32,7 @@ public class CandidateService {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
 
-        CandidateProfile existing = candidateProfileRepository.findByUserId(user.getUserId())
+        CandidateProfile existing = candidateProfileRepository.findByUserUserId(user.getUserId())
             .orElse(new CandidateProfile());
 
         updatedProfile.setUser(user);
