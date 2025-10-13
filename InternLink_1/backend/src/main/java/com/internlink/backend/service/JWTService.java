@@ -8,14 +8,14 @@ import org.springframework.stereotype.Service;
 import com.internlink.backend.entity.User;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JWTService {
 
     private static final long EXPIRATION_TIME = 86400000; // 1 day in ms
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private static final String SECRET = "my_super_secret_key_which_is_atleast_32_cars_long";
+    private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
 
     public String generateToken(User user) {
         return Jwts.builder()
