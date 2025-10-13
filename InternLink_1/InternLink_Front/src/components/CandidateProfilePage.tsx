@@ -144,16 +144,13 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
 
     const fetchProfile = async () =>{
       const token = localStorage.getItem('token');
+      console.log("Fetched token:", token);
       if(!token){
         toast.error('Please log in to access your profile.');
         return; // Stop fetching if not logged in
       }
       try{
-        const response =await apiClient.get('/candidate/profile',{
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const response =await apiClient.get('/candidate/profile');
         if(response.data){
           setFormData(response.data);
         }
