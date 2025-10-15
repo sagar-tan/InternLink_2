@@ -1524,7 +1524,7 @@ https://open.spotify.com/playlist/37i9dQZF1E8KWGOkQ6Xhuz?si=fb8272c3fb314f85
                 <div>
                   <Label className="text-base font-medium">Your Skills</Label>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {formData.skills.map((skill, index) => (
+                    {Array.isArray(formData.skills) && formData.skills.map((skill, index) => (
                       <Badge key={index} variant="secondary" className="flex items-center gap-1">
                         {skill}
                         <X 
@@ -1554,17 +1554,20 @@ https://open.spotify.com/playlist/37i9dQZF1E8KWGOkQ6Xhuz?si=fb8272c3fb314f85
                 <div>
                   <Label className="text-base font-medium">Quick Add Popular Skills</Label>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {commonSkills.map((skill, index) => (
-                      <Badge 
-                        key={index} 
-                        variant={formData.skills.includes(skill) ? "default" : "outline"}
-                        className="cursor-pointer"
-                        onClick={() => toggleCommonSkill(skill)}
+                    {commonSkills.map((skill, index) => {
+                      const hasSkill = Array.isArray(formData.skills) && formData.skills.includes(skill);
+                      return (
+                        <Badge
+                          key={index}
+                          variant={hasSkill ? "default" : "outline"}
+                          className="cursor-pointer"
+                          onClick={() => toggleCommonSkill(skill)}
                       >
                         {skill}
-                        {formData.skills.includes(skill) && <Check className="w-3 h-3 ml-1" />}
+                        {hasSkill && <Check className="w-3 h-3 ml-1" />}
                       </Badge>
-                    ))}
+                    );
+                  })}
                   </div>
                 </div>
 
