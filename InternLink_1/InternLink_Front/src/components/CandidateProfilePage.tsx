@@ -151,8 +151,21 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
       }
       try{
         const response =await apiClient.get('/candidate/profile');
-        if(response.data){
-          setFormData(response.data);
+        const data = response.data;
+        console.log("Fetched profile data:", data);
+        if(data){
+          setFormData({
+            fullName: data.user?.fullName || '',
+            email: data.user?.email || '',
+            phone: data.user?.phone || '',
+            dateOfBirth: data.dateOfBirth || '',
+            gender: data.gender || '',
+            citizenship: data.citizenship || '',
+            currentAddress: data.currentAddress || '',
+            city: data.city || '',
+            state: data.state || '',
+            pincode: data.pincode || ''
+          });
         }
       }
       catch(error:any){
