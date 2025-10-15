@@ -186,6 +186,7 @@ export function ForCandidatesPage({ onNavigate }: ForCandidatesPageProps) {
                     Student Dashboard Preview
                   </CardTitle>
                 </CardHeader>
+                {/* card below to be updated with from the User data */}
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">

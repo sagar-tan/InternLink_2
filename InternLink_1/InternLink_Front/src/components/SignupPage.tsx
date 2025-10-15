@@ -5,7 +5,9 @@ import { Label } from './ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Alert, AlertDescription } from './ui/alert';
-import { Eye, EyeOff, Award, Users, Target, TrendingUp, ArrowLeft, Building, GraduationCap, Briefcase } from 'lucide-react';
+import { Eye, EyeOff, Award, Users, Target, TrendingUp, ArrowLeft, Building, GraduationCap, Briefcase, Phone } from 'lucide-react';
+import apiClient from '../api/apiClient';
+import { toast } from 'sonner';
 
 interface SignupPageProps {
   onNavigate: (page: string) => void;
@@ -51,35 +53,32 @@ export function SignupPage({ onNavigate, onLogin }: SignupPageProps) {
   setIsLoading(true);
 
   try {
-    const response = await fetch("http://localhost:8080/api/auth/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        fullName: formData.fullName,
-        email: formData.email,
-        phone: formData.phone,
-        organization: formData.organization,
-        password: formData.password,
-        userType
-      })
-    });
+    const payload = {
+      fullName: formData.fullName,
+      email: formData.email,
+      phone: formData.phone,
+      organization: formData.organization,
+      password: formData.password,
+      userType,
+    };
+    const response = await apiClient.post("/auth/signup", payload);
 
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to register");
-    }
-
+    console.log("Signup Response: ", response.data);
+    console.log("Status: ", response.status);
     // success: login the user
-     if(response.ok){
+    if (response.status === 201 || response.status === 200) {
       onNavigate('login');
-      alert("Registration successful! Please log in.");
+      toast.success("Registration successful! Please log in.");
      }
-  } catch (err: any) {
+  }
+  
+  catch (err: any) {
     console.error(err.message);
-    alert(err.message);
-  } finally {
+    const message = err.response?.data?.message || err.message || "Signup failed. Please try again.";
+    toast.error(message);
+  } 
+
+  finally {
     setIsLoading(false);
   }
 };

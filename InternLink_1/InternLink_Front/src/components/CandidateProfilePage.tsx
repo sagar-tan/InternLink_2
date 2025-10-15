@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect, SetStateAction } from 'react';
 import { initialCandidateData } from './candidateData';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -35,6 +34,8 @@ import {
 } 
 from 'lucide-react';
 import { toast } from 'sonner';
+import apiClient from '../api/apiClient'; // Import the configured Axios instance this is manually done btw
+import { FormData } from '../types'; // Import the FormData type from types.ts which is now a template pretty much
 
 interface CandidateProfilePageProps {
   onNavigate: (page: string) => void;
@@ -54,72 +55,73 @@ interface EligibilityStatus {
   warnings: string[];
 }
 
-interface FormData {
-
-  //need to add more details for Backend Input
-  dateOfBirth: string;
-  category: string;
-  familyIncome: string;
-  highestDegree: string;
-  institution: string;
-  cgpa: string;
-  class12Marks: string;
-  pmInternshipPrevious: boolean;
-  pmSkillingPrevious: boolean;
-  otherGovtScheme: boolean;
-  natsNapsTraining: boolean;
-  currentlyEmployed: boolean;
-  govtEmployee: boolean;
-  citizenship: string;
-  // Personal required fields
-  fullName?: string;
-  gender?: string;
-  email?: string;
-  phone?: string;
-  currentAddress?: string;
-  city?: string;
-  state?: string;
-  pincode?: string;
-  // Education additional required
-  graduationYear?: string;
-  // Preferences required
-  preferredDomain?: string;
-  preferredLocation?: string;
-}
-
 export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) {
   const [activeTab, setActiveTab] = useState('personal');
-  const [skills, setSkills] = useState<string[]>(['JavaScript', 'React', 'Python']);
   const [newSkill, setNewSkill] = useState('');
 
   // You don’t need this. It’s cosmetic only.
   //const [savedSections, setSavedSections] = useState<string[]>([]);
   const [formData, setFormData] = useState<FormData>({
+    //personal Information
     dateOfBirth: '',
-    category: '',
-    familyIncome: '',
-    highestDegree: '',
-    institution: '',
-    cgpa: '',
-    class12Marks: '',
-    pmInternshipPrevious: false,
-    pmSkillingPrevious: false,
-    otherGovtScheme: false,
-    natsNapsTraining: false,
-    currentlyEmployed: false,
-    govtEmployee: false,
     citizenship: '',
     fullName: '',
     gender: '',
     email: '',
     phone: '',
+    currentlyEmployed: false,
     currentAddress: '',
     city: '',
     state: '',
     pincode: '',
+    //Reservation Details
+    category: '',
+    PwD: false,
+    FGG: false,
+    PwdType: '',
+    //Family Background
+    familyIncome: '',
+    govtEmployee: false,
+    fatherOccupation: '',
+    motherOccupation: '',
+    govtEmployeeDetails: '',
+
+    //Educational BG fields
+    highestDegree: '',
+    institution: '',
+    studyField: '',
+    specialization: '',
+    cgpa: '',
+    currYear: '',
     graduationYear: '',
+
+    //Previous Education fields
+    class12Board: '',
+    class12Year: '',
+    class12Marks: '',
+    class12Stream: '',
+    //Past Participation fields
+    pmInternshipPrevious: false,
+    pmSkillingPrevious: false,
+    otherGovtScheme: false,
+    natsNapsTraining: false,
+    pmleveldetails: '',
+    //Work Experience fields
+    companyName: '',
+    position: '',
+    startDate: '',
+    endDate: '',
+    responsibilities: '',
+    keyAchievements: '',
+    workHereNow: false,
+
+    //Skills
+    skills: [],
+    // Preferences required
     preferredDomain: '',
-    preferredLocation: ''
+    preferredLocation: '',
+    preferredDuration: '',
+    monthlyStipend: ''
   });
   const [eligibilityStatus, setEligibilityStatus] = useState<EligibilityStatus>({
     overall: 'pending',
@@ -134,6 +136,107 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
     issues: [],
     warnings: []
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+
+  useEffect(() => {
+
+    const fetchProfile = async () =>{
+      const token = localStorage.getItem('token');
+      console.log("Fetched token:", token);
+      if(!token){
+        toast.error('Please log in to access your profile.');
+        return; // Stop fetching if not logged in
+      }
+      try{
+        const response =await apiClient.get('/candidate/profile');
+        const data = response.data;
+        console.log("Fetched profile data:", data);
+        if(data){
+          setFormData({
+            //personal Information
+            fullName: data.user?.fullName || '',
+            email: data.user?.email || '',
+            phone: data.user?.phone || '',
+            dateOfBirth: data.dateOfBirth || '',
+            gender: data.gender || '',
+            citizenship: data.citizenship || '',
+            currentAddress: data.currentAddress || '',
+            city: data.city || '',
+            state: data.state || '',
+            pincode: data.pincode || '',
+              
+            // Reservation Details
+            category: data.category || '',
+            PwD: data.PwD || false,
+            FGG: data.FGG || false,
+            PwdType: data.PwdType || '',
+
+            // Family Background
+            familyIncome: data.familyIncome || '',
+            govtEmployee: data.govtEmployee || false,
+            fatherOccupation: data.fatherOccupation || '',
+            motherOccupation: data.motherOccupation || '',
+            govtEmployeeDetails: data.govtEmployeeDetails || '',
+
+            // Educational BG
+            highestDegree: data.education?.highestDegree || '',
+            institution: data.education?.institution || '',
+            studyField: data.education?.studyField || '',
+            specialization: data.education?.specialization || '',
+            cgpa: data.education?.cgpa || '',
+            currYear: data.education?.currYear || '',
+            graduationYear: data.education?.graduationYear || '',
+
+            // Previous Education
+            class12Board: data.education?.class12Board || '',
+            class12Year: data.education?.class12Year || '',
+            class12Marks: data.education?.class12Marks || '',
+            class12Stream: data.education?.class12Stream || '',
+
+            // Past Participation
+            pmInternshipPrevious: data.pmInternshipPrevious || false,
+            pmSkillingPrevious: data.pmSkillingPrevious || false,
+            otherGovtScheme: data.otherGovtScheme || false,
+            natsNapsTraining: data.natsNapsTraining || false,
+            pmleveldetails: data.pmleveldetails || '',
+
+            // Work Experience
+            companyName: data.workExperience?.companyName || '',
+            position: data.workExperience?.position || '',
+            startDate: data.workExperience?.startDate || '',
+            endDate: data.workExperience?.endDate || '',
+            responsibilities: data.workExperience?.responsibilities || '',
+            keyAchievements: data.workExperience?.keyAchievements || '',
+            workHereNow: data.workExperience?.workHereNow || false,
+
+            // Skills & Preferences
+            skills: data.skills || [],
+            preferredDomain: data.preferences?.preferredDomain || '',
+            preferredLocation: data.preferences?.preferredLocation || '',
+            preferredDuration: data.preferences?.preferredDuration || '',
+            monthlyStipend: data.preferences?.monthlyStipend || ''
+          });
+        }
+      }
+      catch(error:any){
+        if(error.response?.status === 404){
+          console.log("New User, no Profile yet");
+        }
+        else{
+          console.error("Error fetching profile:", error);
+          toast.error("Error fetching profile data. Please try again later.");
+        }
+      }
+      finally{
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+
+  }, []);
+
 
   // Common skills for quick selection
   const commonSkills = [
@@ -326,6 +429,16 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleSave = async () => {
+    try {
+      const response = await apiClient.post('/candidate/profile', formData);
+      toast.success('Profile updated successfully!');
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      toast.error('Failed to update profile. Please try again later.');
+    }
+  };
+
   // Effect to recalculate eligibility when form data changes
   useEffect(() => {
     const newStatus = validateEligibility();
@@ -333,21 +446,31 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
   }, [formData]);
 
   const addSkill = () => {
-    if (newSkill.trim() && !skills.includes(newSkill.trim())) {
-      setSkills([...skills, newSkill.trim()]);
+    if (newSkill.trim() && !formData.skills.includes(newSkill.trim())) {
+      setFormData({
+        ...formData,
+        skills: [...formData.skills, newSkill.trim()]
+
+      });
       setNewSkill('');
     }
   };
 
   const removeSkill = (skillToRemove: string) => {
-    setSkills(skills.filter(skill => skill !== skillToRemove));
+    setFormData({
+      ...formData,
+      skills: formData.skills.filter(skill=> skill !== skillToRemove),
+    });
   };
 
   const toggleCommonSkill = (skill: string) => {
-    if (skills.includes(skill)) {
+    if (formData.skills.includes(skill)) {
       removeSkill(skill);
     } else {
-      setSkills([...skills, skill]);
+      setFormData({
+        ...formData,
+        skills: [...formData.skills, skill],
+      });
     }
   };
   //Cosmetic Use of the Save button, doesn't actually do anythign
@@ -390,8 +513,40 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
   
   //Submit Handling Function
   
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
   console.log("Submit button pressed");
+  try {
+
+    const backendKeys = Object.keys(initialCandidateData);
+    const payload: Record<string, any> = {};
+    backendKeys.forEach((key)=>{
+      payload[key] = (formData as any)[key] ?? (initialCandidateData as any)[key];
+    });
+    const token = localStorage.getItem('token');
+    if(!token){
+      toast.error('Ya toh bro token nahi mil rha, ya phir toh ghatiya insaan login krke try krle submit');
+      onNavigate('login');
+      return;
+    }
+    const response = await apiClient.post('/candidate/data', payload);// everything else is defined in ApiClient.ts
+    toast.success('Profile Data Bahutehi pyaar ke saath DB me jaa chuka h, kripya Schema ko dekhke Khushi ka Anubhav kre');
+    console.log('Response:', response.data);
+    onNavigate('candidate-dashboard');
+  } 
+  catch (err: any) {
+    console.error('Error Submitting Candidate data:', err);
+    if(err.response?.status === 401){
+      toast.error('Session Expired. Please log in again.');
+      onNavigate('login');
+    }
+    else{
+      toast.error('Bhagwaan jaane kya beemari  h yrr 😭');
+    }
+
+    
+  }
+
+
   // ... later you can add axios call etc.
   };
 
@@ -442,6 +597,19 @@ const profileComplete = isPersonalComplete && isEducationComplete;
     }
     return true;
   };
+
+
+
+
+
+
+
+
+  if (loading) {
+    return <div>Loading profile...</div>;
+  }
+
+  
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -549,15 +717,55 @@ const profileComplete = isPersonalComplete && isEducationComplete;
           )}
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs value={activeTab} onValueChange={(val: 'personal' | 'education' | 'experience' | 'skills' | 'preferences' | 'documents') => {
+          setActiveTab(val);
+          validateSectionRequired(val);//this can be used as a Send to backend function too
+          window.scrollTo({top : 0, behavior: 'smooth'});
+        }}
+        className="space-y-6"
+        >
           <TabsList className="grid grid-cols-3 lg:grid-cols-6 w-full">
-            <TabsTrigger value="personal" className="text-xs">Personal & Demographics</TabsTrigger>
-            <TabsTrigger value="education" className="text-xs">Education</TabsTrigger>
-            <TabsTrigger value="experience" className="text-xs">Experience</TabsTrigger>
-            <TabsTrigger value="skills" className="text-xs">Skills</TabsTrigger>
-            <TabsTrigger value="preferences" className="text-xs">Preferences</TabsTrigger>
-            <TabsTrigger value="documents" className="text-xs">Documents</TabsTrigger>
+            <TabsTrigger 
+            value="personal" 
+            className="text-xs px-2 py-1 rounded-md data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:font-medium transition-colors duration-200
+             bg-gray-100 text-gray-700 hover:bg-gray-200"
+             >
+              Personal Details
+              </TabsTrigger>
+            <TabsTrigger value="education" className="text-xs px-2 py-1 rounded-md data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:font-medium transition-colors duration-200
+             bg-gray-100 text-gray-700 hover:bg-gray-200"
+             >
+              Education
+            </TabsTrigger>
+            <TabsTrigger 
+            value="experience" 
+            className="text-xs px-2 py-1 rounded-md data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:font-medium transition-colors duration-200
+             bg-gray-100 text-gray-700 hover:bg-gray-200"
+             >
+              Experience
+            </TabsTrigger>
+            <TabsTrigger value="skills" 
+            className="text-xs px-2 py-1 rounded-md data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:font-medium transition-colors duration-200
+             bg-gray-100 text-gray-700 hover:bg-gray-200"
+             >
+              Skills
+            </TabsTrigger>
+            <TabsTrigger value="preferences" 
+            className="text-xs px-2 py-1 rounded-md data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:font-medium transition-colors duration-200
+             bg-gray-100 text-gray-700 hover:bg-gray-200"
+             >
+              Preferences
+            </TabsTrigger>
+            <TabsTrigger value="documents" 
+            className="text-xs px-2 py-1 rounded-md data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:font-medium transition-colors duration-200
+             bg-gray-100 text-gray-700 hover:bg-gray-200"
+             >
+              Documents
+            </TabsTrigger>
           </TabsList>
+          {/*I ain't explaining these changes just a lot of Fomatting details and Validation Changes,
+          now we can add everythign to validate and update in the 
+          validateSectionRequired function*/}
 
           {/* Personal & Demographic Information */}
           <TabsContent value="personal">
@@ -574,8 +782,13 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
                     <Label htmlFor="fullName">Full Name (as per official documents) *</Label>
-                    <Input id="fullName" placeholder="Enter your complete name" />
-                  </div>
+                    <Input id="fullName"
+                           placeholder="Enter your complete name"
+                           value={formData.fullName}
+                           onChange={(e) => updateFormData('fullName', e.target.value)}
+                           required
+                           />{/* //Updating this field also in the form data */}
+                  </div>{/* Full Name and Date of Birth */}
                   {/* this below in the input tag is the input format to actually store in the form data, we have to ensure each field takes input liek this */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -615,23 +828,26 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                         {formData.citizenship && getEligibilityIcon(eligibilityStatus.citizenship)}
                       </div>
                     </div>
-                  </div>
+                  </div>{/* Citizenship selection */}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="gender">Gender *</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select gender" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="male">Male</SelectItem>
+                      <Select
+                          value={formData.gender}
+                          onValueChange={(value: string) => updateFormData('gender', value)}
+                        >{/* Adding Handled For gender Change and add */}
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select gender" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="male">Male</SelectItem>
                           <SelectItem value="female">Female</SelectItem>
                           <SelectItem value="transgender">Transgender</SelectItem>
                           <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
+                    </div> {/* Gender selection */}
                     <div className="space-y-2">
                       <Label htmlFor="currentlyEmployed">Employment Status *</Label>
                       <Select 
@@ -650,33 +866,54 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                         <p className="text-xs text-gray-500">Must not be currently employed</p>
                         {getEligibilityIcon(eligibilityStatus.employment)}
                       </div>
-                    </div>
+                    </div> {/* Employment status */}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="email">Email Address *</Label>
-                      <Input id="email" type="email" placeholder="your.email@example.com" />
+                      <Input id="email"
+                             type="email" 
+                             placeholder="your.email@example.com"
+                             value={formData.email}
+                             onChange={(e) => updateFormData('email', e.target.value)}
+                             />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="phone">Mobile Number *</Label>
-                      <Input id="phone" placeholder="+91 98765 43210" />
+                      <Input id="phone"
+                             placeholder="+91 98765 43210"
+                             value={formData.phone}
+                             onChange={(e) => updateFormData('phone', e.target.value)}
+                             />
                     </div>
-                  </div>
+                  </div> {/* Input fields for email and phone number */}
 
                   <div className="space-y-2">
                     <Label htmlFor="currentAddress">Current Address *</Label>
-                    <Textarea id="currentAddress" placeholder="Enter your complete current address" />
-                  </div>
+                    <Textarea id="currentAddress" 
+                              placeholder="Enter your complete current address"
+                              value={formData.currentAddress}
+                              onChange={(e) => updateFormData('currentAddress', e.target.value)}
+                              /> 
+                  </div>{/* Textarea for multi-line address input */}
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="city">City *</Label>
-                      <Input id="city" placeholder="Mumbai" />
-                    </div>
+                      <Input 
+                          id="city" 
+                          placeholder="Mumbai"
+                          value={formData.city}
+                          onChange={(e) => updateFormData('city', e.target.value)} 
+                          />
+                    </div>{/* City input */}
                     <div className="space-y-2">
                       <Label htmlFor="state">State *</Label>
-                      <Select>
+                      <Select
+                          value={formData.state}
+                          onValueChange={(value: string) => updateFormData('state', value)}
+                        >
                         <SelectTrigger>
                           <SelectValue placeholder="Select state" />
                         </SelectTrigger>
@@ -694,12 +931,12 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                           <SelectItem value="west-bengal">West Bengal</SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
+                    </div>{/* State selection */}
                     <div className="space-y-2">
                       <Label htmlFor="pincode">PIN Code *</Label>
-                      <Input id="pincode" placeholder="400001" />
-                    </div>
-                  </div>
+                      <Input id="pincode" placeholder="400001" value={formData.pincode} onChange={(e) => updateFormData('pincode', e.target.value)} />
+                    </div>{/* PIN Code input */}
+                  </div>{/* Grid for City, State, PIN Code */}
                 </CardContent>
               </Card>
 
@@ -738,23 +975,37 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                     {formData.category === 'ews' && (
                       <p className="text-xs text-blue-600">EWS category requires family income verification below ₹8 Lakh per annum</p>
                     )}
-                  </div>
+                  </div>{/* Category selection */}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="pwd" />
+                      <Checkbox 
+                          id="pwd"
+                          checked={formData.PwD}
+                          onCheckedChange={(checked: boolean) => updateFormData('PwD', checked)}
+                          />
                       <Label htmlFor="pwd">Person with Disability (PwD)</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="firstGeneration" />
+                      <Checkbox 
+                          id="firstGeneration"
+                          checked={formData.FGG}
+                          onCheckedChange={(checked: boolean) => updateFormData('FGG', checked)}
+                          />
                       <Label htmlFor="firstGeneration">First Generation Graduate</Label>
                     </div>
-                  </div>
+                  </div>{/* PwD and First Generation Graduate checkboxes */} 
+
 
                   <div className="space-y-2">
                     <Label htmlFor="disabilityType">If PwD, specify type of disability</Label>
-                    <Input id="disabilityType" placeholder="e.g., Visual, Hearing, Physical, etc." />
-                  </div>
+                    <Input 
+                    id="disabilityType" 
+                    placeholder="e.g., Visual, Hearing, Physical, etc."
+                    value={formData.PwdType}
+                    onChange={(e) => updateFormData('PwdType', e.target.value)}
+                    />
+                  </div>{/* Disability type input */}
                 </CardContent>
               </Card>
 
@@ -770,13 +1021,23 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="fatherOccupation">Father's Occupation * </Label>
-                      <Input id="fatherOccupation" placeholder="e.g., Farmer, Teacher, Business" />
+                      <Input 
+                      id="fatherOccupation" 
+                      placeholder="e.g., Farmer, Teacher, Business" 
+                      value={formData.fatherOccupation}
+                      onChange={(e) => updateFormData('fatherOccupation', e.target.value)}
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="motherOccupation">Mother's Occupation * </Label>
-                      <Input id="motherOccupation" placeholder="e.g., Homemaker, Nurse, etc." />
+                      <Input 
+                      id="motherOccupation" 
+                      placeholder="e.g., Homemaker, Nurse, etc." 
+                      value={formData.motherOccupation}
+                      onChange={(e) => updateFormData('motherOccupation', e.target.value)}
+                      />
                     </div>
-                  </div>
+                  </div>{/* Parents' Occupation inputs */}
 
                   <div className="space-y-2">
                     <Label htmlFor="familyIncome">Annual Family Income * </Label>
@@ -803,31 +1064,54 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                   </div>
 
                   <div className="flex items-center space-x-2">
-                    <Checkbox id="govtEmployee" />
+                    <Checkbox id="govtEmployee" checked={formData.govtEmployee} onCheckedChange={(checked: boolean) => updateFormData('govtEmployee', checked)} />
                     <Label htmlFor="govtEmployee">
                       Is there a government employee in your immediate family? *
                     </Label>
-                  </div>
+                  </div>{/* Checkbox for government employee in family */}
 
                   <div className="space-y-2">
                     <Label htmlFor="govtEmployeeDetails">If yes, provide details * </Label>
-                    <Input id="govtEmployeeDetails" placeholder="e.g., Father - State Government Teacher" />
-                  </div>
+                    <Input 
+                    id="govtEmployeeDetails" 
+                    placeholder="e.g., Father - State Government Teacher" 
+                    value={formData.govtEmployeeDetails}
+                    onChange={(e) => updateFormData('govtEmployeeDetails', e.target.value)}
+                    />
+                  </div>{/* Government employee details input */}
                 </CardContent>
               </Card>
               
 
 
               {/*This button is for Personal Section*/}
-
-
-
-              
               <Button 
-                onClick={()=> console.log("Go to Education Section by clicking this")}
-                //onClick={() => saveSection('personal')} 
+                onClick={() => {
+                  console.log("Go to Education Section by clicking this");
+                  setActiveTab('education');
+                  window.scrollTo({ top: 0, behavior: 'smooth'});//scrolls to top when the tab changes SMoooooothly 
+                }}
                 className="w-full"
                 disabled={eligibilityStatus.overall === 'not-eligible'}
+
+                /* Anyways here are lyrics for SMooth Operator, jazziest song everrr, You might be tired reading all this!!
+    
+                Face to face, each classic case
+                We shadow box and double cross
+                Yet need the chase
+                A license to love, insurance to hold
+                Melts all your memories and change into gold
+                His eyes are like angels but his heart is cold
+                No need to ask
+                He's a smooth operator
+                Smooth operator
+                Smooth operator
+                Smooth operator
+                Coast to coast, LA to Chicago, western male
+                */
+
+                //onClick={() => saveSection('personal')} 
+
               >
                 <Save className="w-4 h-4 mr-2" />
                 Save Personal & Demographic Information
@@ -883,7 +1167,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                         <p className="text-xs text-gray-500">PhD holders are not eligible for this scheme</p>
                       )}
                       {eligibilityStatus.education === 'not-eligible' && getEligibilityIcon('not-eligible')}
-                    </div>
+                    </div>{/* Highest Degree selection */}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="institution">University/Institution *</Label>
@@ -896,17 +1180,20 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                       onChange={(e) => updateFormData('institution', e.target.value)}
                       className={eligibilityStatus.academic === 'not-eligible' ? 'border-red-500' : ''} //this line just means it would make the border red if academic status is ineligible
                     />
-                  </div>
+                  </div>{/* Institution input */}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="fieldOfStudy">Field of Study *</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select field of study" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="engineering">Engineering</SelectItem>
+                  <Select
+                      value={formData.studyField}
+                      onValueChange={(value: string) => updateFormData('studyField', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select field of study" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="engineering">Engineering</SelectItem>
                       <SelectItem value="computer-science">Computer Science</SelectItem>
                       <SelectItem value="commerce">Commerce</SelectItem>
                       <SelectItem value="management">Management</SelectItem>
@@ -923,17 +1210,22 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                       <SelectItem value="design">Design</SelectItem>
                       <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
-                  </Select>
-                </div>
+                  </Select>{/* Field of Study selection */}
+                </div>{/* Field of Study selection */}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="specialization">Specialization/Major</Label>
-                    <Input id="specialization" placeholder="e.g., Computer Science & Engineering" />
-                  </div>
+                    <Input 
+                    id="specialization" 
+                    placeholder="e.g., Computer Science & Engineering" 
+                    value={formData.specialization}
+                    onChange={(e) => updateFormData('specialization', e.target.value)}
+                  />
+                  </div>{/*Specialization Input*/}
                   <div className="space-y-2">
                     <Label htmlFor="year">Current Year/Status</Label>
-                    <Select>
+                    <Select onValueChange={(value: string) => updateFormData('currYear', value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select current status" />
                       </SelectTrigger>
@@ -947,9 +1239,15 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                         <SelectItem value="gap-year">Gap Year</SelectItem>
                       </SelectContent>
                     </Select>
-                  </div>
+                  </div>{/* Current Year Status*/}
                 </div>
+                {/* 
+Miss/Mr Reviewer,
 
+Check this out tho
+https://open.spotify.com/playlist/37i9dQZF1E8KWGOkQ6Xhuz?si=fb8272c3fb314f85 
+
+*/}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="cgpa">CGPA/Percentage *</Label>
@@ -970,9 +1268,17 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="graduationYear">Year of Completion/Expected Graduation *</Label>
-                    <Input id="graduationYear" type="number" placeholder="2025" min="2020" max="2030" />
-                  </div>
-                </div>
+                    <Input 
+                    id="graduationYear" 
+                    type="number" 
+                    placeholder="2025" 
+                    min="2020" 
+                    max="2030" 
+                    value={formData.graduationYear}
+                    onChange={(e) => updateFormData('graduationYear', e.target.value)}
+                    />
+                  </div>{/* Graduation Year input */}
+                </div>{/* CGPA and Graduation Year inputs */}
 
                 <Separator />
 
@@ -981,7 +1287,10 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="class12Board">Class 12th Board *</Label>
-                      <Select>
+                      <Select
+                        value={formData.class12Board}
+                        onValueChange={(value: string) => updateFormData('class12Board', value)}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select board" />
                         </SelectTrigger>
@@ -994,7 +1303,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                           <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
+                    </div>{/* Class 12th Board selection */}
                     <div className="space-y-2">
                       <Label htmlFor="class12Marks">Class 12th Marks/Percentage *</Label>
                       <Input 
@@ -1004,13 +1313,16 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                         onChange={(e) => updateFormData('class12Marks', e.target.value)}
                         className={eligibilityStatus.academic === 'not-eligible' ? 'border-red-500' : ''}
                       />
-                    </div>
+                    </div>{/* Class 12th Marks input */}
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <div className="space-y-2">
                       <Label htmlFor="class12Stream">Class 12th Stream</Label>
-                      <Select>
+                      <Select
+                        value={formData.class12Stream}
+                        onValueChange={(value: string) => updateFormData('class12Stream', value)}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select stream" />
                         </SelectTrigger>
@@ -1023,19 +1335,48 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                           <SelectItem value="vocational">Vocational</SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
+                    </div>{/* Class 12th Stream selection */}
                     <div className="space-y-2">
                       <Label htmlFor="class12Year">Class 12th Year of Completion</Label>
-                      <Input id="class12Year" type="number" placeholder="2022" min="2015" max="2025" />
-                    </div>
+                      <Input 
+                      id="class12Year" 
+                      type="number" 
+                      placeholder="2022" 
+                      min="2015" 
+                      max="2025" 
+                      value={formData.class12Year}
+                      onChange={(e) => updateFormData('class12Year', e.target.value)}
+                      />
+                    </div>{/* Class 12th Year input */}
                   </div>
                 </div>
                 
-                {/*This button is for Personal Section*/}
+                {/*This button is for Education Section*/}
                 
                 <Button 
-                  onClick={() => console.log("Change me around line 964 to add the navigate to NExt section maybe experience?")}
+                  onClick={() => {console.log("Change me around line 964 to add the navigate to NExt section maybe experience?")
+                    setActiveTab('experience');
+                    window.scrollTo({ top: 0, behavior: 'smooth'});//scrolls to top when the tab changes SMoooooothly againnnnn
+                  }}
+
+                  /* 
+                  Anyways Here are rest of the lyrics for Smooth Operator, jazziest song everrr
+                  Coast to coast, LA to Chicago, western male
+                  Across the north and south, to Key Largo, love for sale
+                  Smooth operator
+                  Smooth operator
+                  Smooth operator
+                  Smooth operator
+                  Smooth operator
+                  Smooth operator
+                  Smooth operator
+                  Smooth operator
+                  Smooth operator
+                  Smooth operator
+                  Smooth operator
+                  */
                   //onClick={() => saveSection('education')} 
+                  
                   className="w-full"
                   disabled={eligibilityStatus.overall === 'not-eligible'}
                 >
@@ -1078,7 +1419,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                         Have you previously participated in any PM-level internship scheme?
                       </Label>
                       {formData.pmInternshipPrevious && <XCircle className="w-4 h-4 text-red-600" />}
-                    </div>
+                    </div>{/* Pm Internship done? */}
 
                     <div className="flex items-center space-x-2">
                       <Checkbox 
@@ -1090,7 +1431,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                         Have you previously participated in any PM-level skilling scheme?
                       </Label>
                       {formData.pmSkillingPrevious && <XCircle className="w-4 h-4 text-red-600" />}
-                    </div>
+                    </div>{/* Pm Skilling done? */}
 
                     <div className="flex items-center space-x-2">
                       <Checkbox 
@@ -1102,7 +1443,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                         Have you participated in any other government employment/training scheme?
                       </Label>
                       {formData.otherGovtScheme && <AlertTriangle className="w-4 h-4 text-yellow-600" />}
-                    </div>
+                    </div>{/* Pm Training done? */}
                   </div>
 
                   <div className="space-y-2">
@@ -1111,9 +1452,10 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                       id="schemeDetails" 
                       placeholder="Name of scheme, year of participation, duration, outcome, etc."
                       rows={3}
+                      value={formData.pmleveldetails}
+                      onChange={(e)=> updateFormData('pmleveldetails', e.target.value)}
                     />
-                  </div>
-
+                  </div>{/* pm level Details */}
                   <div className="flex items-center gap-2">
                     <p className="text-xs text-gray-500">Previous participation status:</p>
                     {getEligibilityIcon(eligibilityStatus.participation)}
@@ -1134,24 +1476,61 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="companyName">Company/Organization</Label>
-                      <Input id="companyName" placeholder="TechFlow India Pvt. Ltd." />
-                    </div>
+                      <Input 
+                      id="companyName" 
+                      placeholder="TechFlow India Pvt. Ltd." 
+                      value={formData.companyName}
+                      onChange={(e)=> updateFormData('companyName', e.target.value)}
+                      />
+                    </div> {/* Company name */}
+
                     <div className="space-y-2">
                       <Label htmlFor="position">Position/Role</Label>
-                      <Input id="position" placeholder="Software Development Intern" />
-                    </div>
+                      <Input 
+                      id="position" 
+                      placeholder="Software Development Intern" 
+                      value={formData.position}
+                      onChange={(e)=> updateFormData('position', e.target.value)}
+                      />
+                    </div>{/* Company Position */}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Start Date */}
                     <div className="space-y-2">
                       <Label htmlFor="startDate">Start Date</Label>
-                      <Input id="startDate" type="month" />
+                      <Input 
+                        id="startDate" 
+                        type="month" 
+                        value={formData.startDate}
+                        onChange={(e)=> updateFormData('startDate', e.target.value)}
+                      />
                     </div>
+
+                    {/* End Date + Checkbox in same column */}
                     <div className="space-y-2">
                       <Label htmlFor="endDate">End Date</Label>
-                      <Input id="endDate" type="month" />
+                      <Input 
+                        id="endDate" 
+                        type="month" 
+                        value={formData.workHereNow ? new Date().toISOString().slice(0,7) : formData.endDate}
+                        onChange={(e)=> updateFormData('endDate', e.target.value)}
+                        disabled={formData.workHereNow} 
+                        className={formData.workHereNow ? 'bg-gray-100 cursor-not-allowed' : ''} //disables end date if currently work is enabled
+                      />
+
+                      {/* Checkbox below End Date */}
+                      <div className="flex items-center space-x-2 mt-2">
+                        <Checkbox 
+                          id="currentWork"
+                          checked={formData.workHereNow}
+                          onCheckedChange={(checked: boolean | undefined) => updateFormData('workHereNow', !!checked)} 
+                        />
+                        <Label htmlFor="currentWork">I currently work here</Label>
+                      </div>
                     </div>
-                  </div>
+                  </div>{/* Joining Duration Details */}
+
 
                   <div className="space-y-2">
                     <Label htmlFor="jobDescription">Description & Responsibilities</Label>
@@ -1171,15 +1550,17 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                     />
                   </div>
 
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="currentWork" />
-                    <Label htmlFor="currentWork">I currently work here</Label>
-                  </div>
+                  
                 </CardContent>
               </Card>
 
               <Button 
-                onClick={() => console.log("Change me on line 962 to add the navigate to NExt section maybe Skills?")}
+                onClick={() => {
+                    console.log("Change me on line 1206 to add the navigate to Next section maybe Skills?")
+                    window.scrollTo({top:0, behavior: 'smooth'});
+                    setActiveTab('skills')
+                  }
+                }
                 // onClick={() => saveSection('experience')} 
                 className="w-full"
                 disabled={eligibilityStatus.overall === 'not-eligible'}
@@ -1199,6 +1580,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                   Skills & Competencies
                   {isSkillsComplete && <Check className="w-4 h-4 text-green-600" />}
                   {/* again just the validation for the check sign with the title of the section */}
+
                   {/* {isSectionSaved('skills') && <Check className="w-4 h-4 text-green-600" />} */}
                 </CardTitle>
               </CardHeader>
@@ -1207,7 +1589,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                 <div>
                   <Label className="text-base font-medium">Your Skills</Label>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {skills.map((skill, index) => (
+                    {Array.isArray(formData.skills) && formData.skills.map((skill, index) => (
                       <Badge key={index} variant="secondary" className="flex items-center gap-1">
                         {skill}
                         <X 
@@ -1225,7 +1607,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                     placeholder="Add a skill"
                     value={newSkill}
                     onChange={(e) => setNewSkill(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && addSkill()}
+                    onKeyUp={(e) => e.key === 'Enter' && addSkill()}
                   />
                   <Button onClick={addSkill} size="sm">
                     <Plus className="w-4 h-4" />
@@ -1237,22 +1619,29 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                 <div>
                   <Label className="text-base font-medium">Quick Add Popular Skills</Label>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {commonSkills.map((skill, index) => (
-                      <Badge 
-                        key={index} 
-                        variant={skills.includes(skill) ? "default" : "outline"}
-                        className="cursor-pointer"
-                        onClick={() => toggleCommonSkill(skill)}
+                    {commonSkills.map((skill, index) => {
+                      const hasSkill = Array.isArray(formData.skills) && formData.skills.includes(skill);
+                      return (
+                        <Badge
+                          key={index}
+                          variant={hasSkill ? "default" : "outline"}
+                          className="cursor-pointer"
+                          onClick={() => toggleCommonSkill(skill)}
                       >
                         {skill}
-                        {skills.includes(skill) && <Check className="w-3 h-3 ml-1" />}
+                        {hasSkill && <Check className="w-3 h-3 ml-1" />}
                       </Badge>
-                    ))}
+                    );
+                  })}
                   </div>
                 </div>
 
                 <Button
-                  onClick={() => console.log("Change me around line 1182 to add the navigate to NExt section maybe Preferences?")} 
+                  onClick={() =>{
+                    window.scrollTo({top:0, behavior: 'smooth'});
+                    setActiveTab('preferences');
+                    console.log("This is a check for the Details of Skills Saved or not in array", formData.skills)}
+                    } 
                   //onClick={() => saveSection('skills')} className="w-full"
                   >
                   <Save className="w-4 h-4 mr-2" />
@@ -1275,7 +1664,10 @@ const profileComplete = isPersonalComplete && isEducationComplete;
               <CardContent className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="preferredDomain">Preferred Domain/Field *</Label>
-                  <Select>
+                  <Select
+                    value={formData.preferredDomain}
+                    onValueChange={(value: string) => updateFormData('preferredDomain', value)}
+                    >
                     <SelectTrigger>
                       <SelectValue placeholder="Select preferred domain" />
                     </SelectTrigger>
@@ -1313,7 +1705,10 @@ const profileComplete = isPersonalComplete && isEducationComplete;
 
                 <div className="space-y-2">
                   <Label htmlFor="preferredLocation">Preferred Location *</Label>
-                  <Select>
+                  <Select
+                    value={formData.preferredLocation}
+                    onValueChange={(value: string) => updateFormData('preferredLocation', value)}
+                    >
                     <SelectTrigger>
                       <SelectValue placeholder="Select preferred location" />
                     </SelectTrigger>
@@ -1334,7 +1729,10 @@ const profileComplete = isPersonalComplete && isEducationComplete;
 
                 <div className="space-y-2">
                   <Label htmlFor="internshipDuration">Preferred Duration</Label>
-                  <Select>
+                  <Select
+                  value={formData.preferredDuration}
+                  onValueChange={(value: string) => updateFormData('preferredDuration', value)}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select duration" />
                     </SelectTrigger>
@@ -1349,7 +1747,10 @@ const profileComplete = isPersonalComplete && isEducationComplete;
 
                 <div className="space-y-2">
                   <Label htmlFor="expectedStipend">Expected Monthly Stipend</Label>
-                  <Select>
+                  <Select
+                  value={formData.monthlyStipend}
+                  onValueChange={(value: string) => updateFormData('monthlyStipend', value)}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select stipend range" />
                     </SelectTrigger>
@@ -1365,7 +1766,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                 </div>
 
                 <Button
-                  onClick={() => console.log("Change me on line 1298 to add the navigate to NExt section maybe docs?")} 
+                  onClick={() => console.log("Change me on line 1392 to add the navigate to Next section maybe docs?")} 
                   // onClick={() => saveSection('preferences')} className="w-full"
                   >
                   <Save className="w-4 h-4 mr-2" />
@@ -1373,7 +1774,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                 </Button>
               </CardContent>
             </Card>
-          </TabsContent>
+          </TabsContent>{/* This one is completed with Handling */}
 
           {/* Documents */}
           <TabsContent value="documents">
@@ -1443,7 +1844,7 @@ const profileComplete = isPersonalComplete && isEducationComplete;
                     </div>
                   </div>
                 </div>
-                <Button onClick={() => console.log("Change me on line 962 to add the navigate to NExt section maybe experience?")}          
+                <Button onClick={() => console.log("Change me on line 1470 to add the navigate to NExt section maybe experience?")}          
                 /* <Button onClick={() => saveSection('documents')}*/
                  className="w-full">
                   <Save className="w-4 h-4 mr-2" />
@@ -1453,6 +1854,13 @@ const profileComplete = isPersonalComplete && isEducationComplete;
             </Card>
           </TabsContent>
         </Tabs>
+
+
+        {/* Honestly i couldn't give 2 shi*s about this section, we'll deal with this later i am going to sleeeep1!!!! */}
+
+
+
+
         {/* Final Submission */}
         
 

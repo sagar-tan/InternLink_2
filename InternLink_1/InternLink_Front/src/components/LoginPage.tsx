@@ -5,9 +5,13 @@ import { Label } from './ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Alert, AlertDescription } from './ui/alert';
-import { Eye, EyeOff, Award, Users, Target, TrendingUp, ArrowLeft, Briefcase } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
+import { Eye, EyeOff, Award, Users, Target, TrendingUp, ArrowLeft, Briefcase, AlertTriangle } from 'lucide-react';
+import apiClient from '../api/apiClient';
+import { toast } from 'sonner';
 
 
+ 
 interface LoginPageProps {
   onNavigate: (page: string) => void;
   onLogin: (userType: 'recruiter' | 'candidate', userData: any) => void;
@@ -19,34 +23,31 @@ export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [userType, setUserType] = useState<'recruiter' | 'candidate'>('candidate');
   const [isLoading, setIsLoading] = useState(false);
+  const [roleMismatch, setRoleMismatch] = useState<string | null>(null);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        // include the UI-selected userType so backend can return role-specific user data
-        body: JSON.stringify({ email, password, userType }),
+      const res = await apiClient.post('/auth/login', {
+        email,
+        password,
+        userType
       });
+      
 
-      const data = await res.json();
 
-      if (!res.ok) {
-        // API should return a helpful message in data.message
-        throw new Error(data?.message || 'Login failed');
+
+      // Save token if provided 200OK
+      if (res.data?.token) {
+        localStorage.setItem('token', res.data.token);
+        localStorage.setItem('userType', res.data.userType);
+        toast.success(`Welcome back, ${res.data.userType}!`);
       }
-
-      // Save token if provided
-      if (data?.token) {
-        localStorage.setItem('token', data.token);
-      }
-
+      const userFromApi = res.data?.user || res.data?.userData || res.data;      
       // Backend might return the user object under `user` or `userData` or directly
-      const userFromApi = data?.user || data?.userData || data;
+
 
       // Build a normalized user object expected by App.handleLogin
       const normalizedUser = {
@@ -60,8 +61,21 @@ export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
       // Notify parent (App) that login succeeded with normalized data
       onLogin(normalizedUser.userType, normalizedUser);
     } catch (err: any) {
-      // Show a user-friendly error; keep the alert for now
-      alert(err?.message || 'An unexpected error occurred during login');
+
+      if(err.response){
+        const status = err.response.status;
+        const message = err.response.data?.message || 'Login Failed';
+
+        if(status === 400){
+          setRoleMismatch(message);
+        }
+        else{
+          alert(message);
+        }
+      }
+      else{
+        alert(err.message || 'Unexpected Error');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -84,6 +98,44 @@ export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 flex">
+      {/* Role Mismatch Dialog */}
+      <Dialog open={!!roleMismatch} onOpenChange={() => setRoleMismatch(null)}>
+        <DialogContent className="w-full max-w-md mx-auto">
+          <DialogHeader>
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-100">
+              <AlertTriangle className="h-6 w-6 text-amber-600" />
+            </div>
+            <DialogTitle className="text-center">Account Type Mismatch</DialogTitle>
+            <DialogDescription className="text-center pt-2">
+              {roleMismatch}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <DialogFooter className="flex-col sm:flex-col gap-2 mt-4">
+            <Button
+              onClick={() => {
+                const correctType = roleMismatch?.includes('recruiter') ? 'recruiter' : 'candidate';
+                setUserType(correctType);
+                setRoleMismatch(null);
+              }}
+              className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
+            >
+              Switch to {roleMismatch?.includes('recruiter') ? 'Recruiter' : 'Candidate'} Login
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                onNavigate('signup');
+                setRoleMismatch(null);
+              }}
+              className="w-full"
+            >
+              Create New Account
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Left Side - Login Form */}
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md">

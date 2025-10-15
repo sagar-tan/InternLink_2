@@ -14,4 +14,5 @@ public class SignupRequest {
     private String role;
     private String userType; // "student" or "employer"
     //we will have to add a Captcha field here later
+    //Google Login field can also be added later
 }

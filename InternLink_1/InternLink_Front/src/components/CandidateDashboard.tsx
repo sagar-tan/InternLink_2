@@ -283,9 +283,10 @@ export function CandidateDashboard({ onNavigate }: CandidateDashboardProps) {
         <CardContent>
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-medium text-gray-700">PM Scheme Eligibility: Verified</span>
-            <span className="text-sm text-gray-600">85% Complete</span>
+            <span className="text-sm text-gray-600">85% Complete</span>{/* to be dynamic based on user profile completion */}
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
+            {/* progress bar to be dynamic based on user profile completion */}
             <div className="bg-gradient-to-r from-primary to-accent h-2 rounded-full" style={{ width: '85%' }}></div>
           </div>
           
