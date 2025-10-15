@@ -154,7 +154,46 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
         const data = response.data;
         console.log("Fetched profile data:", data);
         if(data){
-          setFormData({
+          setFormData({// soooo the issue was, the actuall data that we receive from the backend is like this, don't pay too much attention to it
+            /* 
+            {
+    "data": {
+        "candidateId": 1,
+        "user": {
+            "userId": 1,
+            "fullName": "sagar  .",
+            "email": "Sagar.22SCSE1180226@galgotiasuniversity.edu.in",
+            "passwordHash": "$2a$10$rP81UmkhiZxlHmKvj4qYR.w2W/Z7JBF6EiAkHRWlzzlolrtUynDtS",
+            "organization": "Sagar.22SCSE1180226@galgotiasuniversity.edu.in",
+            "phone": "+917027472121",
+            "role": "candidate",
+            "createdAt": "2025-10-02T13:55:38.857331"
+        },
+        "gender": null,
+        "city": null,
+        "state": null,
+        "category": null,
+        "education": null,
+        "preferences": null,
+        "skills": null
+    },
+    "status": 200,
+    "statusText": "",
+    "headers": {
+        "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+        "content-type": "application/json",
+        "expires": "0",
+        "pragma": "no-cache"
+    },
+    "request": {}
+}
+
+
+what does this mean? we were looking for full name in "data.fullName"
+but the actual name data was in "data.user.fullName", why? because this single fetch command receieves everything, and we'd want everything, won't we
+now for further details when they are added we'll need to accomodate these maps according to the data recieved
+            
+            */
             //personal Information
             fullName: data.user?.fullName || '',
             email: data.user?.email || '',
