@@ -155,6 +155,7 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
         console.log("Fetched profile data:", data);
         if(data){
           setFormData({
+            //personal Information
             fullName: data.user?.fullName || '',
             email: data.user?.email || '',
             phone: data.user?.phone || '',
@@ -164,7 +165,58 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
             currentAddress: data.currentAddress || '',
             city: data.city || '',
             state: data.state || '',
-            pincode: data.pincode || ''
+            pincode: data.pincode || '',
+              
+            // Reservation Details
+            category: data.category || '',
+            PwD: data.PwD || false,
+            FGG: data.FGG || false,
+            PwdType: data.PwdType || '',
+
+            // Family Background
+            familyIncome: data.familyIncome || '',
+            govtEmployee: data.govtEmployee || false,
+            fatherOccupation: data.fatherOccupation || '',
+            motherOccupation: data.motherOccupation || '',
+            govtEmployeeDetails: data.govtEmployeeDetails || '',
+
+            // Educational BG
+            highestDegree: data.education?.highestDegree || '',
+            institution: data.education?.institution || '',
+            studyField: data.education?.studyField || '',
+            specialization: data.education?.specialization || '',
+            cgpa: data.education?.cgpa || '',
+            currYear: data.education?.currYear || '',
+            graduationYear: data.education?.graduationYear || '',
+
+            // Previous Education
+            class12Board: data.education?.class12Board || '',
+            class12Year: data.education?.class12Year || '',
+            class12Marks: data.education?.class12Marks || '',
+            class12Stream: data.education?.class12Stream || '',
+
+            // Past Participation
+            pmInternshipPrevious: data.pmInternshipPrevious || false,
+            pmSkillingPrevious: data.pmSkillingPrevious || false,
+            otherGovtScheme: data.otherGovtScheme || false,
+            natsNapsTraining: data.natsNapsTraining || false,
+            pmleveldetails: data.pmleveldetails || '',
+
+            // Work Experience
+            companyName: data.workExperience?.companyName || '',
+            position: data.workExperience?.position || '',
+            startDate: data.workExperience?.startDate || '',
+            endDate: data.workExperience?.endDate || '',
+            responsibilities: data.workExperience?.responsibilities || '',
+            keyAchievements: data.workExperience?.keyAchievements || '',
+            workHereNow: data.workExperience?.workHereNow || false,
+
+            // Skills & Preferences
+            skills: data.skills || [],
+            preferredDomain: data.preferences?.preferredDomain || '',
+            preferredLocation: data.preferences?.preferredLocation || '',
+            preferredDuration: data.preferences?.preferredDuration || '',
+            monthlyStipend: data.preferences?.monthlyStipend || ''
           });
         }
       }
