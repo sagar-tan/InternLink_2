@@ -26,7 +26,7 @@ import com.internlink.backend.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     // This is used in UserService to check if a user exists
-    Optional<User> findByEmail(String email);
+    Optional<User> findByEmail(String email); //adding Optional Here Fked the Signup, because then it wasn't returning null....
     User findByPhone(String phone);
     boolean existsByEmail(String email);
     // This method is not used currently, but can be used for login functionality

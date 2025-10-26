@@ -44,8 +44,9 @@ public class UserService {
 //    ------------------------------ SIGNUP METHOD ------------------------------
 
     public User signup(SignupRequest request) {// this is called in AuthController
+        //if(userRepository.findByEmail(request.getEmail()) != null){   this was earlier and because findByEmail is Optional<User> it alwys returns something
 
-        if (userRepository.findByEmail(request.getEmail()) != null) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {//we were checking if there was something or not, But clearly there was so it was simply returning Something, which is Well not null...
             throw new IllegalArgumentException("Email already registered");//Exceptions Defined in GlobalExceptionHandler.java
         }
         if(userRepository.findByPhone(request.getPhone()) != null) {
@@ -59,8 +60,8 @@ public class UserService {
         user.setOrganization(request.getOrganization());
         user.setPhone(request.getPhone());
 
-        // Map frontend userType to role
-        user.setRole(request.getUserType().toLowerCase());
+        // Map frontend role to role
+        user.setRole(request.getRole().toLowerCase());
 
         return userRepository.save(user);// saving the user object to the database and returning the saved user
     }
