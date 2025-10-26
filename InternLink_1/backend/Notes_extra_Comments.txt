@@ -1,1 +1,4 @@
 The backend for signup is perfectly up and running! hell yea
+
+
+The SignUP and Login is perfectly working, now  i have to create a system to handle the data from the Frontend About the User
