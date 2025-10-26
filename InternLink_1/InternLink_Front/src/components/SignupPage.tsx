@@ -61,6 +61,7 @@ export function SignupPage({ onNavigate, onLogin }: SignupPageProps) {
       password: formData.password,
       userType,
     };
+    
     const response = await apiClient.post("/auth/signup", payload);
 
     console.log("Signup Response: ", response.data);

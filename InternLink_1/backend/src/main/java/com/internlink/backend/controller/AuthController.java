@@ -40,6 +40,8 @@ public class AuthController {
         response.put("message", "Signup Successful");//Affirmation of Success
         return response;// returning the response map to the frontend, the @postMapping annotation ensures that this method handles POST requests to /api/auth/signup
     }
+
+    
     @Autowired
     private AuthService authService;
     @PostMapping("/login")
