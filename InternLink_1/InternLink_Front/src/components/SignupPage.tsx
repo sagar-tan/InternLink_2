@@ -59,7 +59,7 @@ export function SignupPage({ onNavigate, onLogin }: SignupPageProps) {
       phone: formData.phone,
       organization: formData.organization,
       password: formData.password,
-      userType,
+      role: userType,
     };
     
     const response = await apiClient.post("/auth/signup", payload);

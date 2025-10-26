@@ -15,11 +15,18 @@ apiClient.interceptors.request.use(
     console.log("[apiClient] Request URL:", config.url);
     console.log("[apiClient] Method:", config.method);
     console.log("[apiClient] Original headers:", config.headers);
-    if (token) {
+    if (
+      token &&
+      !config.url?.includes("/auth/login")&&
+      !config.url?.includes("/auth/signup")
+    ) {
       console.log("[apiClient] Attaching token:", token);
       config.headers.Authorization = `Bearer ${token}`;
-    } else {
+    } else if(!token) {
       console.log("[apiClient] No token found in localStorage");
+    }
+    else{
+      console.log("[apiClient] Skipping Token Attachment for Public Route")
     }
     return config;
   },
