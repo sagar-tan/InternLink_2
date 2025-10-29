@@ -103,13 +103,13 @@ public class CandidateProfile {
 
     // ✅ Relationships
     @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<EducationDTO> education;
+    private List<EducationDTO> education; // we were using Entities instead of DTOs
 
     @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ExperienceDTO> experience;
 
     @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<String> skills;
+    private List<String> skills; //Also using Entities instead of DTO
 
     @OneToOne(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
     private CandidatePreference preferences;

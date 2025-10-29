@@ -25,8 +25,8 @@ public class CandidateExperience {
     @JoinColumn(name = "candidate_id", nullable = false)
     private CandidateProfile candidate;
 
-    private String organization;
-    private String role;
+    private String companyName;
+    private String position;
     private String startDate;
     private String endDate;
     private Boolean currentlyWorking;
