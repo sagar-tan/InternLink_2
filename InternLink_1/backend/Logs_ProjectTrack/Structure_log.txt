@@ -7,6 +7,7 @@ C:.
     |   InternlinkBackendApplication.java
     |   
     +---config
+    |       JwtAuthenticationFilter.java
     |       SecurityConfig.java
     |       WebConfig.java
     |       
@@ -19,6 +20,11 @@ C:.
     +---dto
     |       AuthRequest.java
     |       AuthResponse.java
+    |       CandidateProfileRequest.java
+    |       EducationDTO.java
+    |       ExperienceDTO.java
+    |       ParticipationDTO.java
+    |       PreferencesDTO.java
     |       SignupRequest.java
     |       
     +---entity
@@ -26,6 +32,7 @@ C:.
     |       CandidateExperience.java
     |       CandidatePreference.java
     |       CandidateProfile.java
+    |       CandidateSkill.java
     |       Internship.java
     |       MatchScore.java
     |       User.java
@@ -45,4 +52,3 @@ C:.
             MatchingEngine.java
             RecruiterService.java
             UserService.java
-            

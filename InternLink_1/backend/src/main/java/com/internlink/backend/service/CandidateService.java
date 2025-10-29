@@ -10,6 +10,7 @@ import com.internlink.backend.repository.UserRepository;
 
 @Service
 public class CandidateService {
+    
 
     @Autowired
     private CandidateProfileRepository candidateProfileRepository;

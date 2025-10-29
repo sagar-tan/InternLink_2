@@ -276,7 +276,6 @@ now for further details when they are added we'll need to accomodate these maps 
 
   }, []);
 
-
   // Common skills for quick selection
   const commonSkills = [
     'JavaScript', 'Python', 'Java', 'C++', 'React', 'Node.js', 'Django', 'Flask',
