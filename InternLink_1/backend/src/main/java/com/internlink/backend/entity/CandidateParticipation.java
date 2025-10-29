@@ -1,6 +1,13 @@
 package com.internlink.backend.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,8 +25,18 @@ public class CandidateParticipation {
     @JoinColumn(name = "candidate_id", nullable = false)
     private CandidateProfile candidate;
 
-    private String hackathons;    // JSON or comma-separated list
-    private String certifications;
-    private String volunteering;
-    private String achievements;
+    @Column(name = "pm_internship_previous")
+    private Boolean pmInternshipPrevious;
+
+    @Column(name = "pm_skilling_previousPrevious")
+    private Boolean pmSkillingPrevious;
+
+    @Column (name = "other_govt_scheme")
+    private Boolean otherGovtScheme;
+
+    @Column(name = "nats_naps_training")
+    private Boolean natsNapsTraining;
+
+    @Column(name = "pm_level_details")
+    private String pmlevelDetails;
 }

@@ -62,7 +62,7 @@ public class CandidateService {
 
     @Transactional
     public CandidateProfile saveOrUpdateProfile(String email, CandidateProfile req) {
-        
+
         User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         CandidateProfile profile = candidateProfileRepository.findByUserUserId(user.getUserId()).orElse(new CandidateProfile());
 
