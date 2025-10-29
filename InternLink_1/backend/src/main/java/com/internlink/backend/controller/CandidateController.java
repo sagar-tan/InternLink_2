@@ -78,4 +78,7 @@ public class CandidateController {
                     .body("Error saving/updating candidate profile");
         }
     }
+
+
+    
 }
