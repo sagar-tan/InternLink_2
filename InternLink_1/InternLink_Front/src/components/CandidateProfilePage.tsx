@@ -1,5 +1,4 @@
 import { useState, useEffect, SetStateAction } from 'react';
-import { initialCandidateData } from './candidateData';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
@@ -154,6 +153,16 @@ export function CandidateProfilePage({ onNavigate }: CandidateProfilePageProps) 
         const data = response.data;
         console.log("Fetched profile data:", data);
         if(data){
+          const profile = data?.data ?? data;
+          const education = profile.education ?? {};
+          const workExperience = profile.workExperience ?? profile.experience ?? {};
+          const preferences = profile.preferences ?? {};
+          const participation = profile.participation ?? {};
+          const rawSkills = Array.isArray(profile.skills) ? profile.skills : [];
+          const normalizedSkills = rawSkills
+            .map((skill: any) => (typeof skill === 'string' ? skill : skill?.skillName))
+            .filter(Boolean);
+
           setFormData({// soooo the issue was, the actuall data that we receive from the backend is like this, don't pay too much attention to it
             /* 
             {
@@ -195,67 +204,67 @@ now for further details when they are added we'll need to accomodate these maps 
             
             */
             //personal Information
-            fullName: data.user?.fullName || '',
-            email: data.user?.email || '',
-            phone: data.user?.phone || '',
-            dateOfBirth: data.dateOfBirth || '',
-            gender: data.gender || '',
-            citizenship: data.citizenship || '',
-            currentAddress: data.currentAddress || '',
-            city: data.city || '',
-            state: data.state || '',
-            pincode: data.pincode || '',
+            fullName: profile.fullName || profile.user?.fullName || '',
+            email: profile.email || profile.user?.email || '',
+            phone: profile.phone || profile.user?.phone || '',
+            dateOfBirth: profile.dateOfBirth || '',
+            gender: profile.gender || '',
+            citizenship: profile.citizenship || '',
+            currentAddress: profile.currentAddress || '',
+            city: profile.city || '',
+            state: profile.state || '',
+            pincode: profile.pincode || '',
               
             // Reservation Details
-            category: data.category || '',
-            PwD: data.PwD || false,
-            FGG: data.FGG || false,
-            PwdType: data.PwdType || '',
+            category: profile.category || '',
+            PwD: profile.PwD ?? profile.pwd ?? profile.isPwD ?? false,
+            FGG: profile.FGG ?? profile.fgg ?? profile.firstGenerationGraduate ?? false,
+            PwdType: profile.PwdType || profile.pwdType || profile.disabilityType || '',
 
             // Family Background
-            familyIncome: data.familyIncome || '',
-            govtEmployee: data.govtEmployee || false,
-            fatherOccupation: data.fatherOccupation || '',
-            motherOccupation: data.motherOccupation || '',
-            govtEmployeeDetails: data.govtEmployeeDetails || '',
+            familyIncome: profile.familyIncome || '',
+            govtEmployee: profile.govtEmployee || false,
+            fatherOccupation: profile.fatherOccupation || '',
+            motherOccupation: profile.motherOccupation || '',
+            govtEmployeeDetails: profile.govtEmployeeDetails || '',
 
             // Educational BG
-            highestDegree: data.education?.highestDegree || '',
-            institution: data.education?.institution || '',
-            studyField: data.education?.studyField || '',
-            specialization: data.education?.specialization || '',
-            cgpa: data.education?.cgpa || '',
-            currYear: data.education?.currYear || '',
-            graduationYear: data.education?.graduationYear || '',
+            highestDegree: profile.highestDegree || education.highestDegree || '',
+            institution: profile.institution || education.institution || '',
+            studyField: profile.studyField || education.studyField || education.fieldOfStudy || '',
+            specialization: profile.specialization || education.specialization || '',
+            cgpa: profile.cgpa || education.cgpa || '',
+            currYear: profile.currYear || education.currYear || '',
+            graduationYear: profile.graduationYear || education.graduationYear || education.yearOfGraduation || '',
 
             // Previous Education
-            class12Board: data.education?.class12Board || '',
-            class12Year: data.education?.class12Year || '',
-            class12Marks: data.education?.class12Marks || '',
-            class12Stream: data.education?.class12Stream || '',
+            class12Board: profile.class12Board || education.class12Board || '',
+            class12Year: profile.class12Year || education.class12Year || '',
+            class12Marks: profile.class12Marks || education.class12Marks || '',
+            class12Stream: profile.class12Stream || education.class12Stream || '',
 
             // Past Participation
-            pmInternshipPrevious: data.pmInternshipPrevious || false,
-            pmSkillingPrevious: data.pmSkillingPrevious || false,
-            otherGovtScheme: data.otherGovtScheme || false,
-            natsNapsTraining: data.natsNapsTraining || false,
-            pmleveldetails: data.pmleveldetails || '',
+            pmInternshipPrevious: profile.pmInternshipPrevious ?? participation.pmInternshipPrevious ?? false,
+            pmSkillingPrevious: profile.pmSkillingPrevious ?? participation.pmSkillingPrevious ?? false,
+            otherGovtScheme: profile.otherGovtScheme ?? participation.otherGovtScheme ?? false,
+            natsNapsTraining: profile.natsNapsTraining ?? participation.natsNapsTraining ?? false,
+            pmleveldetails: profile.pmleveldetails || profile.pmLevelDetails || participation.pmLevelDetails || '',
 
             // Work Experience
-            companyName: data.workExperience?.companyName || '',
-            position: data.workExperience?.position || '',
-            startDate: data.workExperience?.startDate || '',
-            endDate: data.workExperience?.endDate || '',
-            responsibilities: data.workExperience?.responsibilities || '',
-            keyAchievements: data.workExperience?.keyAchievements || '',
-            workHereNow: data.workExperience?.workHereNow || false,
+            companyName: profile.companyName || workExperience.companyName || '',
+            position: profile.position || workExperience.position || '',
+            startDate: profile.startDate || workExperience.startDate || '',
+            endDate: profile.endDate || workExperience.endDate || '',
+            responsibilities: profile.responsibilities || workExperience.responsibilities || '',
+            keyAchievements: profile.keyAchievements || workExperience.keyAchievements || '',
+            workHereNow: profile.workHereNow ?? workExperience.workHereNow ?? false,
 
             // Skills & Preferences
-            skills: data.skills || [],
-            preferredDomain: data.preferences?.preferredDomain || '',
-            preferredLocation: data.preferences?.preferredLocation || '',
-            preferredDuration: data.preferences?.preferredDuration || '',
-            monthlyStipend: data.preferences?.monthlyStipend || ''
+            skills: normalizedSkills,
+            preferredDomain: profile.preferredDomain || preferences.preferredDomain || '',
+            preferredLocation: profile.preferredLocation || preferences.preferredLocation || '',
+            preferredDuration: profile.preferredDuration || preferences.preferredDuration || preferences.internshipDuration || '',
+            monthlyStipend: profile.monthlyStipend || preferences.monthlyStipend || preferences.expectedStipend || ''
           });
         }
       }
@@ -555,18 +564,13 @@ now for further details when they are added we'll need to accomodate these maps 
   console.log("Submit button pressed");
   try {
 
-    const backendKeys = Object.keys(initialCandidateData);
-    const payload: Record<string, any> = {};
-    backendKeys.forEach((key)=>{
-      payload[key] = (formData as any)[key] ?? (initialCandidateData as any)[key];
-    });
     const token = localStorage.getItem('token');
     if(!token){
       toast.error('Ya toh bro token nahi mil rha, ya phir toh ghatiya insaan login krke try krle submit');
       onNavigate('login');
       return;
     }
-    const response = await apiClient.post('/candidate/data', payload);// everything else is defined in ApiClient.ts
+    const response = await apiClient.post('/candidate/data', formData);// everything else is defined in ApiClient.ts
     toast.success('Profile Data Bahutehi pyaar ke saath DB me jaa chuka h, kripya Schema ko dekhke Khushi ka Anubhav kre');
     console.log('Response:', response.data);
     onNavigate('candidate-dashboard');

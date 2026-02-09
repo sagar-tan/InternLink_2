@@ -13,6 +13,7 @@ import com.internlink.backend.entity.User;
 import com.internlink.backend.repository.UserRepository;
 import com.internlink.backend.service.JWTService;
 
+import io.micrometer.common.lang.NonNull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,9 +29,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private UserRepository userRepository;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+    protected void doFilterInternal(
+                                    @NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain)
                                     throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");

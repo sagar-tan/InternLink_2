@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.internlink.backend.entity.CandidateProfile;
+import com.internlink.backend.dto.CandidateProfileDto;
 import com.internlink.backend.service.CandidateService;
 import com.internlink.backend.service.JWTService;
 
@@ -49,7 +49,7 @@ public class CandidateController {
             }
 
             // Get candidate profile using email
-            CandidateProfile profile = candidateService.getCandidateProfileByEmail(email);
+            CandidateProfileDto profile = candidateService.getCandidateProfileByEmail(email);
             return ResponseEntity.ok(profile);
 
         } catch (Exception e) {
@@ -63,19 +63,39 @@ public class CandidateController {
     @PostMapping("/profile")
     public ResponseEntity<?> saveOrUpdateProfile(
             @RequestHeader("Authorization") String token,
-            @RequestBody CandidateProfile profile) {
+            @RequestBody CandidateProfileDto profile) {
 
         try {
             String jwt = token.replace("Bearer ", "");
             String email = jwtService.extractEmail(jwt);
 
-            CandidateProfile savedProfile = candidateService.saveOrUpdateProfile(email, profile);
+            CandidateProfileDto savedProfile = candidateService.saveOrUpdateProfile(email, profile);
             return ResponseEntity.ok(savedProfile);
 
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error saving/updating candidate profile");
+        }
+    }
+
+    // ✅ Save Candidate Data (alias for profile save)
+    @PostMapping("/data")
+    public ResponseEntity<?> saveCandidateData(
+            @RequestHeader("Authorization") String token,
+            @RequestBody CandidateProfileDto profile) {
+
+        try {
+            String jwt = token.replace("Bearer ", "");
+            String email = jwtService.extractEmail(jwt);
+
+            CandidateProfileDto savedProfile = candidateService.saveOrUpdateProfile(email, profile);
+            return ResponseEntity.ok(savedProfile);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error saving candidate data");
         }
     }
 

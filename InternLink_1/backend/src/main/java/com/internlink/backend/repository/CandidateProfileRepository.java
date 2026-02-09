@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import com.internlink.backend.entity.CandidateProfile;
 
 @Repository
-public interface CandidateProfileRepository extends JpaRepository<CandidateProfile, Integer> {
+public interface CandidateProfileRepository extends JpaRepository<CandidateProfile, Long> {
     Optional<CandidateProfile> findByUserUserId(Long userId);
 }

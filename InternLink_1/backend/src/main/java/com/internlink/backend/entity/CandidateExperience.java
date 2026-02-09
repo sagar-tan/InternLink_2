@@ -10,6 +10,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "candidate_experience")
@@ -23,12 +24,14 @@ public class CandidateExperience {
 
     @ManyToOne
     @JoinColumn(name = "candidate_id", nullable = false)
+    @JsonIgnore
     private CandidateProfile candidate;
 
     private String companyName;
     private String position;
     private String startDate;
     private String endDate;
-    private Boolean currentlyWorking;
-    private String description;
+    private String responsibilities;
+    private String keyAchievements;
+    private Boolean workHereNow;
 }

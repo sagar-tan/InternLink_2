@@ -52,9 +52,6 @@ package com.internlink.backend.entity;
 
 import java.util.List;
 
-import com.internlink.backend.dto.EducationDTO;
-import com.internlink.backend.dto.ExperienceDTO;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -103,13 +100,13 @@ public class CandidateProfile {
 
     // ✅ Relationships
     @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<EducationDTO> education; // we were using Entities instead of DTOs
+    private List<CandidateEducation> education;
 
     @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ExperienceDTO> experience;
+    private List<CandidateExperience> experience;
 
     @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<String> skills; //Also using Entities instead of DTO
+    private List<CandidateSkill> skills;
 
     @OneToOne(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
     private CandidatePreference preferences;

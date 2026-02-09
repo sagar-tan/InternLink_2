@@ -9,6 +9,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 @Entity
@@ -32,6 +35,7 @@ public class CandidateEducation {
 
 package com.internlink.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -55,12 +59,18 @@ public class CandidateEducation {
 
     @ManyToOne
     @JoinColumn(name = "candidate_id", nullable = false)
+    @JsonIgnore
     private CandidateProfile candidate;
 
     private String level;             // e.g., Bachelor, Master, Diploma
     private String institution;
-    private String fieldOfStudy;
-    private String startYear;
+    private String studyField;
+    private String specialization;
+    private String cgpa;
+    private String currYear;
     private String graduationYear;
-    private Double grade;             // Optional CGPA/percentage
+    private String class12Board;
+    private String class12Year;
+    private String class12Marks;
+    private String class12Stream;
 }

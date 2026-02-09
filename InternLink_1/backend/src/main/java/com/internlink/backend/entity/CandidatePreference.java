@@ -10,6 +10,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "candidate_preferences")
@@ -23,12 +24,13 @@ public class CandidatePreference {
 
     @OneToOne
     @JoinColumn(name = "candidate_id", nullable = false)
+    @JsonIgnore
     private CandidateProfile candidate;
 
     private String preferredDomain;
     private String preferredLocation;
-    private String workMode;  // e.g., Remote, Hybrid, On-site
-    private String expectedStipend;
+    private String preferredDuration;
+    private String monthlyStipend;
 }
 
 /* package com.internlink.backend.entity;
